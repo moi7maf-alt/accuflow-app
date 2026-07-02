@@ -57,97 +57,14 @@
         .dark-mode .app-select-sm { background: #1e293b url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23818cf8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 8px center !important; background-size: 12px !important; border-color: #6366f1 !important; color: #e2e8f0 !important; }
         .dark-mode .app-select-sm option { background: #1e293b !important; color: #e2e8f0 !important; }
 
-        /* ====================================================
-           PRINT STYLES — هيدر ثابت في كل صفحة
-           ==================================================== */
+        /* طباعة الفاتورة تتم عبر نافذة مستقلة في printInvoice() */
         @media print {
-            @page { size: A4 portrait; margin: 8mm 10mm; }
-
+            @page { size: A4 portrait; margin: 0; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-
             .no-print { display: none !important; }
-
-            /* إخفاء كل شيء غير الفاتورة */
             body { background: white !important; }
             aside, #sec-dashboard, #sec-clients, #sec-history, #sec-settings { display: none !important; }
             main { margin: 0 !important; padding: 0 !important; width: 100% !important; }
-            #sec-invoicing { display: block !important; padding: 0 !important; }
-
-            /* منطقة الطباعة */
-            .print-area {
-                width: 100% !important;
-                border: none !important;
-                box-shadow: none !important;
-                border-radius: 0 !important;
-                padding: 0 !important;
-                background: white !important;
-            }
-
-            /* ===== الجدول الرئيسي للفاتورة — هيكل thead/tbody =====
-               thead = table-header-group → يتكرر تلقائياً في كل صفحة
-               tbody = table-row-group  → يمتد عبر الصفحات          */
-            .inv-page-table {
-                width: 100% !important;
-                border-collapse: collapse !important;
-                table-layout: fixed !important;
-            }
-            .inv-page-table thead { display: table-header-group !important; }
-            .inv-page-table tbody { display: table-row-group !important; }
-            .inv-page-table tfoot { display: table-footer-group !important; }
-            .inv-page-table tr  { break-inside: avoid !important; }
-            .inv-page-table td  { padding: 0 !important; border: none !important; vertical-align: top !important; }
-
-            /* === هيدر الفاتورة (يظهر في كل صفحة) === */
-            .print-inv-header {
-                background: #f0f4ff !important;
-                border-bottom: 3px solid #6366f1 !important;
-                padding: 4mm 6mm 4mm !important;
-                display: block !important;
-                width: 100% !important;
-            }
-            .print-inv-header h1 { color: #4f46e5 !important; font-size: 22pt !important; font-weight: 900 !important; }
-            .print-inv-header .seller-name { color: #1e293b !important; }
-            .print-inv-header .inv-meta { color: #475569 !important; }
-
-            /* هيدر الشاشة يُخفى أثناء الطباعة */
-            .accounting-header { display: none !important; }
-
-            /* هيدر الطباعة يظهر في كل صفحة عبر thead */
-            .print-inv-header { display: block !important; }
-
-            /* === محتوى الصفحة === */
-            .print-inv-body {
-                padding: 4mm 6mm !important;
-                display: block !important;
-            }
-
-            /* === فوتر الإجماليات (يبقى مع آخر صفحة) === */
-            .total-divider {
-                border-top: 2px solid #6366f1 !important;
-                margin-top: 4mm !important;
-                padding-top: 3mm !important;
-                page-break-inside: avoid !important;
-            }
-
-            /* إجبار ظهور اللوجو والباركود */
-            #logoImage { display: block !important; max-height: 70px !important; visibility: visible !important; }
-            #print-logo-area { display: block !important; }
-            #qrcode canvas, #qrcode img { display: block !important; width: 75px !important; height: 75px !important; }
-
-            /* الختم المائي */
-            .watermark-stamp {
-                display: block !important;
-                position: fixed !important;
-                top: 50% !important; left: 50% !important;
-                transform: translate(-50%, -50%) rotate(-30deg) !important;
-                opacity: 0.08 !important;
-            }
-
-            /* جدول البنود */
-            .items-print-table { width: 100% !important; border-collapse: collapse !important; }
-            .items-print-table th, .items-print-table td { font-size: 9pt !important; }
-            .items-print-table tbody tr { break-inside: avoid !important; }
-
             input, select, textarea { border: none !important; background: transparent !important; color: #1e293b !important; }
         }
     </style>
@@ -620,9 +537,11 @@
         };
 
         const COUNTRIES = [
+            { code: 'DZ', nameEn: 'Algeria', curr: 'DZD', phone: '+213', taxN: 'VAT', taxR: 19, numFmt: 'fr' },
             { code: 'AR', nameAr: 'الأرجنتين', nameEn: 'Argentina', curr: 'ARS', phone: '+54', taxN: 'IVA', taxR: 21, numFmt: 'de' },
             { code: 'AU', nameAr: 'أستراليا', nameEn: 'Australia', curr: 'AUD', phone: '+61', taxN: 'GST', taxR: 10, numFmt: 'en' },
             { code: 'AT', nameAr: 'النمسا', nameEn: 'Austria', curr: 'EUR', phone: '+43', taxN: 'MwSt', taxR: 20, numFmt: 'de' },
+            { code: 'BH', nameEn: 'Bahrain', curr: 'BHD', phone: '+973', taxN: 'VAT', taxR: 0, numFmt: 'en' },
             { code: 'BD', nameAr: 'بنغلاديش', nameEn: 'Bangladesh', curr: 'BDT', phone: '+880', taxN: 'VAT', taxR: 15, numFmt: 'en' },
             { code: 'BE', nameAr: 'بلجيكا', nameEn: 'Belgium', curr: 'EUR', phone: '+32', taxN: 'TVA', taxR: 21, numFmt: 'de' },
             { code: 'BR', nameAr: 'البرازيل', nameEn: 'Brazil', curr: 'BRL', phone: '+55', taxN: 'ICMS', taxR: 18, numFmt: 'de' },
@@ -631,57 +550,55 @@
             { code: 'CN', nameAr: 'الصين', nameEn: 'China', curr: 'CNY', phone: '+86', taxN: 'VAT', taxR: 13, numFmt: 'en' },
             { code: 'CO', nameAr: 'كولومبيا', nameEn: 'Colombia', curr: 'COP', phone: '+57', taxN: 'IVA', taxR: 19, numFmt: 'en' },
             { code: 'DK', nameAr: 'الدنمارك', nameEn: 'Denmark', curr: 'DKK', phone: '+45', taxN: 'VAT', taxR: 25, numFmt: 'de' },
+            { code: 'EG', nameEn: 'Egypt', curr: 'EGP', phone: '+20', taxN: 'VAT', taxR: 14, numFmt: 'en' },
             { code: 'FI', nameAr: 'فنلندا', nameEn: 'Finland', curr: 'EUR', phone: '+358', taxN: 'VAT', taxR: 24, numFmt: 'de' },
             { code: 'FR', nameAr: 'فرنسا', nameEn: 'France', curr: 'EUR', phone: '+33', taxN: 'TVA', taxR: 20, numFmt: 'fr' },
             { code: 'DE', nameAr: 'ألمانيا', nameEn: 'Germany', curr: 'EUR', phone: '+49', taxN: 'MwSt', taxR: 19, numFmt: 'de' },
             { code: 'GR', nameAr: 'اليونان', nameEn: 'Greece', curr: 'EUR', phone: '+30', taxN: 'IVA', taxR: 24, numFmt: 'de' },
             { code: 'IN', nameAr: 'الهند', nameEn: 'India', curr: 'INR', phone: '+91', taxN: 'GST', taxR: 18, numFmt: 'en' },
             { code: 'ID', nameAr: 'إندونيسيا', nameEn: 'Indonesia', curr: 'IDR', phone: '+62', taxN: 'VAT (PPN)', taxR: 11, numFmt: 'en' },
+            { code: 'IQ', nameEn: 'Iraq', curr: 'IQD', phone: '+964', taxN: 'VAT', taxR: 0, numFmt: 'en' },
             { code: 'IE', nameAr: 'أيرلندا', nameEn: 'Ireland', curr: 'EUR', phone: '+353', taxN: 'VAT', taxR: 23, numFmt: 'en' },
             { code: 'IT', nameAr: 'إيطاليا', nameEn: 'Italy', curr: 'EUR', phone: '+39', taxN: 'IVA', taxR: 22, numFmt: 'de' },
             { code: 'JP', nameAr: 'اليابان', nameEn: 'Japan', curr: 'JPY', phone: '+81', taxN: 'Consumption Tax', taxR: 10, numFmt: 'en' },
+            { code: 'JO', nameEn: 'Jordan', curr: 'JOD', phone: '+962', taxN: 'Sales Tax', taxR: 16, numFmt: 'en' },
             { code: 'KE', nameAr: 'كينيا', nameEn: 'Kenya', curr: 'KES', phone: '+254', taxN: 'VAT', taxR: 16, numFmt: 'en' },
+            { code: 'KW', nameEn: 'Kuwait', curr: 'KWD', phone: '+965', taxN: 'VAT', taxR: 0, numFmt: 'en' },
+            { code: 'LB', nameEn: 'Lebanon', curr: 'LBP', phone: '+961', taxN: 'VAT', taxR: 11, numFmt: 'en' },
+            { code: 'LY', nameEn: 'Libya', curr: 'LYD', phone: '+218', taxN: 'VAT', taxR: 0, numFmt: 'en' },
             { code: 'MY', nameAr: 'ماليزيا', nameEn: 'Malaysia', curr: 'MYR', phone: '+60', taxN: 'SST', taxR: 8, numFmt: 'en' },
             { code: 'MX', nameAr: 'المكسيك', nameEn: 'Mexico', curr: 'MXN', phone: '+52', taxN: 'IVA', taxR: 16, numFmt: 'en' },
+            { code: 'MA', nameEn: 'Morocco', curr: 'MAD', phone: '+212', taxN: 'VAT', taxR: 20, numFmt: 'fr' },
             { code: 'NL', nameAr: 'هولندا', nameEn: 'Netherlands', curr: 'EUR', phone: '+31', taxN: 'BTW', taxR: 21, numFmt: 'de' },
             { code: 'NZ', nameAr: 'نيوزيلندا', nameEn: 'New Zealand', curr: 'NZD', phone: '+64', taxN: 'GST', taxR: 15, numFmt: 'en' },
             { code: 'NG', nameAr: 'نيجيريا', nameEn: 'Nigeria', curr: 'NGN', phone: '+234', taxN: 'VAT', taxR: 7.5, numFmt: 'en' },
             { code: 'NO', nameAr: 'النرويج', nameEn: 'Norway', curr: 'NOK', phone: '+47', taxN: 'VAT', taxR: 25, numFmt: 'de' },
+            { code: 'OM', nameEn: 'Oman', curr: 'OMR', phone: '+968', taxN: 'VAT', taxR: 0, numFmt: 'en' },
             { code: 'PK', nameAr: 'باكستان', nameEn: 'Pakistan', curr: 'PKR', phone: '+92', taxN: 'Sales Tax', taxR: 17, numFmt: 'en' },
+            { code: 'PS', nameEn: 'Palestine', curr: 'ILS', phone: '+970', taxN: 'VAT', taxR: 17, numFmt: 'en' },
             { code: 'PE', nameAr: 'بيرو', nameEn: 'Peru', curr: 'PEN', phone: '+51', taxN: 'IGV', taxR: 18, numFmt: 'en' },
             { code: 'PH', nameAr: 'الفلبين', nameEn: 'Philippines', curr: 'PHP', phone: '+63', taxN: 'VAT', taxR: 12, numFmt: 'en' },
             { code: 'PL', nameAr: 'بولندا', nameEn: 'Poland', curr: 'PLN', phone: '+48', taxN: 'VAT', taxR: 23, numFmt: 'fr' },
             { code: 'PT', nameAr: 'البرتغال', nameEn: 'Portugal', curr: 'EUR', phone: '+351', taxN: 'IVA', taxR: 23, numFmt: 'de' },
+            { code: 'QA', nameEn: 'Qatar', curr: 'QAR', phone: '+974', taxN: 'VAT', taxR: 0, numFmt: 'en' },
             { code: 'RU', nameAr: 'روسيا', nameEn: 'Russia', curr: 'RUB', phone: '+7', taxN: 'VAT', taxR: 20, numFmt: 'de' },
+            { code: 'SA', nameEn: 'Saudi Arabia', curr: 'SAR', phone: '+966', taxN: 'VAT', taxR: 15, numFmt: 'en' },
             { code: 'SG', nameAr: 'سنغافورة', nameEn: 'Singapore', curr: 'SGD', phone: '+65', taxN: 'GST', taxR: 9, numFmt: 'en' },
             { code: 'ZA', nameAr: 'جنوب إفريقيا', nameEn: 'South Africa', curr: 'ZAR', phone: '+27', taxN: 'VAT', taxR: 15, numFmt: 'en' },
             { code: 'KR', nameAr: 'كوريا الجنوبية', nameEn: 'South Korea', curr: 'KRW', phone: '+82', taxN: 'VAT', taxR: 10, numFmt: 'en' },
             { code: 'ES', nameAr: 'إسبانيا', nameEn: 'Spain', curr: 'EUR', phone: '+34', taxN: 'IVA', taxR: 21, numFmt: 'de' },
+            { code: 'SD', nameEn: 'Sudan', curr: 'SDG', phone: '+249', taxN: 'VAT', taxR: 17, numFmt: 'en' },
             { code: 'SE', nameAr: 'السويد', nameEn: 'Sweden', curr: 'SEK', phone: '+46', taxN: 'VAT', taxR: 25, numFmt: 'fr' },
             { code: 'CH', nameAr: 'سويسرا', nameEn: 'Switzerland', curr: 'CHF', phone: '+41', taxN: 'VAT', taxR: 8.1, numFmt: 'de' },
+            { code: 'SY', nameEn: 'Syria', curr: 'SYP', phone: '+963', taxN: 'VAT', taxR: 0, numFmt: 'en' },
             { code: 'TH', nameAr: 'تايلاند', nameEn: 'Thailand', curr: 'THB', phone: '+66', taxN: 'VAT', taxR: 7, numFmt: 'en' },
+            { code: 'TN', nameEn: 'Tunisia', curr: 'TND', phone: '+216', taxN: 'VAT', taxR: 19, numFmt: 'fr' },
             { code: 'TR', nameAr: 'تركيا', nameEn: 'Turkey', curr: 'TRY', phone: '+90', taxN: 'KDV', taxR: 18, numFmt: 'de' },
+            { code: 'AE', nameEn: 'United Arab Emirates', curr: 'AED', phone: '+971', taxN: 'VAT', taxR: 5, numFmt: 'en' },
             { code: 'GB', nameAr: 'المملكة المتحدة', nameEn: 'United Kingdom', curr: 'GBP', phone: '+44', taxN: 'VAT', taxR: 20, numFmt: 'en' },
             { code: 'US', nameAr: 'الولايات المتحدة', nameEn: 'United States', curr: 'USD', phone: '+1', taxN: 'Sales Tax', taxR: 7, numFmt: 'en' },
             { code: 'VN', nameAr: 'فيتنام', nameEn: 'Vietnam', curr: 'VND', phone: '+84', taxN: 'VAT', taxR: 10, numFmt: 'en' },
-            { code: 'SA', nameEn: 'Saudi Arabia', curr: 'SAR', phone: '+966', taxN: 'VAT', taxR: 15, numFmt: 'en' },
-            { code: 'EG', nameEn: 'Egypt', curr: 'EGP', phone: '+20', taxN: 'VAT', taxR: 14, numFmt: 'en' },
-            { code: 'AE', nameEn: 'United Arab Emirates', curr: 'AED', phone: '+971', taxN: 'VAT', taxR: 5, numFmt: 'en' },
-            { code: 'QA', nameEn: 'Qatar', curr: 'QAR', phone: '+974', taxN: 'VAT', taxR: 0, numFmt: 'en' },
-            { code: 'KW', nameEn: 'Kuwait', curr: 'KWD', phone: '+965', taxN: 'VAT', taxR: 0, numFmt: 'en' },
-            { code: 'OM', nameEn: 'Oman', curr: 'OMR', phone: '+968', taxN: 'VAT', taxR: 0, numFmt: 'en' },
-            { code: 'BH', nameEn: 'Bahrain', curr: 'BHD', phone: '+973', taxN: 'VAT', taxR: 0, numFmt: 'en' },
-            { code: 'IQ', nameEn: 'Iraq', curr: 'IQD', phone: '+964', taxN: 'VAT', taxR: 0, numFmt: 'en' },
-            { code: 'JO', nameEn: 'Jordan', curr: 'JOD', phone: '+962', taxN: 'Sales Tax', taxR: 16, numFmt: 'en' },
-            { code: 'LB', nameEn: 'Lebanon', curr: 'LBP', phone: '+961', taxN: 'VAT', taxR: 11, numFmt: 'en' },
-            { code: 'MA', nameEn: 'Morocco', curr: 'MAD', phone: '+212', taxN: 'VAT', taxR: 20, numFmt: 'fr' },
-            { code: 'DZ', nameEn: 'Algeria', curr: 'DZD', phone: '+213', taxN: 'VAT', taxR: 19, numFmt: 'fr' },
-            { code: 'TN', nameEn: 'Tunisia', curr: 'TND', phone: '+216', taxN: 'VAT', taxR: 19, numFmt: 'fr' },
-            { code: 'LY', nameEn: 'Libya', curr: 'LYD', phone: '+218', taxN: 'VAT', taxR: 0, numFmt: 'en' },
-            { code: 'SD', nameEn: 'Sudan', curr: 'SDG', phone: '+249', taxN: 'VAT', taxR: 17, numFmt: 'en' },
-            { code: 'SY', nameEn: 'Syria', curr: 'SYP', phone: '+963', taxN: 'VAT', taxR: 0, numFmt: 'en' },
             { code: 'YE', nameEn: 'Yemen', curr: 'YER', phone: '+967', taxN: 'VAT', taxR: 0, numFmt: 'en' },
-            { code: 'PS', nameEn: 'Palestine', curr: 'ILS', phone: '+970', taxN: 'VAT', taxR: 17, numFmt: 'en' },
         ];
 
         const DB_KEY = 'accuflow_erp_en_v1';
@@ -806,59 +723,248 @@
         }
 
         /* ======================================================
-           printInvoice — يملأ هيدر الطباعة ثم يطبع
-           هيدر الطباعة موجود داخل <thead> فيتكرر تلقائياً
-           في كل صفحة بواسطة CSS display:table-header-group
+           printInvoice — يبني نافذة طباعة مستقلة
+           الهيدر داخل <thead> يتكرر تلقائياً في كل صفحة
+           هذا الأسلوب يعمل في Chrome / Edge / Firefox / Safari
            ====================================================== */
         function printInvoice() {
-            const t = i18n[state.lang];
+            const t    = i18n[state.lang];
+            const sets = state.sets;
+            const logo = localStorage.getItem('accu_logo') || '';
+            const invId    = document.getElementById('invId').value;
+            const client   = document.getElementById('cName').value || '';
+            const dateStr  = document.getElementById('invDateFull').innerText;
+            const dueDate  = document.getElementById('invDueDate').value || '';
+            const notes    = document.getElementById('invNotes').value.trim();
+            const payMeth  = document.getElementById('invPayMethod').value;
+            const status   = document.getElementById('invStatus').value;
+            const statusLbl = t[status] || status.toUpperCase();
 
-            // --- اسم البائع ---
-            document.getElementById('printSellerName').innerText = state.sets.seller || '';
-            document.getElementById('printInvTitle').innerText   = t.invoiceTitle || 'TAX INVOICE';
+            // ألوان الحالة
+            const sBg  = status==='paid' ? '#d1fae5' : status==='unpaid' ? '#fee2e2' : '#e2e8f0';
+            const sClr = status==='paid' ? '#065f46' : status==='unpaid' ? '#991b1b' : '#475569';
 
-            // --- رقم الفاتورة والتاريخ ---
-            document.getElementById('printInvNoLabel').innerText = (t.invNo || 'INV NO') + ' ';
-            document.getElementById('printInvNo').innerText      = document.getElementById('invId').value;
-            document.getElementById('printDateStr').innerText    = document.getElementById('invDateFull').innerText;
+            // حساب المبالغ
+            let sub = 0;
+            state.items.forEach(it => sub += (it.qty||0) * (it.price||0));
+            const tax = sub * (sets.taxR / 100);
+            const tot = sub + tax;
 
-            // --- اسم العميل ---
-            document.getElementById('printClientLabel').innerText = t.buyerLabel || 'Customer';
-            document.getElementById('printClientName').innerText  = document.getElementById('cName').value || '';
+            // QR code كـ data-url (من العنصر الموجود في الصفحة)
+            let qrDataUrl = '';
+            try {
+                const qrCanvas = document.querySelector('#qrcode canvas');
+                if (qrCanvas) qrDataUrl = qrCanvas.toDataURL('image/png');
+            } catch(e) {}
 
-            // --- الحالة badge ---
-            const s = document.getElementById('invStatus').value;
-            const badge = document.getElementById('printStatusBadge');
-            badge.innerText = t[s] || s.toUpperCase();
-            badge.style.background = s === 'paid' ? '#d1fae5' : s === 'unpaid' ? '#fee2e2' : '#e2e8f0';
-            badge.style.color      = s === 'paid' ? '#065f46' : s === 'unpaid' ? '#991b1b' : '#475569';
+            // ---- بناء صفوف البنود ----
+            const itemRows = state.items.map(it => {
+                const lineTotal = (it.qty||0) * (it.price||0);
+                return `
+                <tr>
+                    <td style="padding:7px 6px; border-bottom:1px solid #f1f5f9; font-weight:700; font-size:9.5pt; color:#1e293b">${it.desc||''}</td>
+                    <td style="padding:7px 6px; border-bottom:1px solid #f1f5f9; text-align:center; font-size:9pt; color:#64748b">${it.unit||''}</td>
+                    <td style="padding:7px 6px; border-bottom:1px solid #f1f5f9; text-align:center; font-weight:900; font-size:9.5pt; color:#4f46e5">${it.qty||0}</td>
+                    <td style="padding:7px 6px; border-bottom:1px solid #f1f5f9; text-align:center; font-weight:700; font-size:9.5pt">${fmtNum(it.price||0)}</td>
+                    <td style="padding:7px 6px; border-bottom:1px solid #f1f5f9; text-align:right; font-weight:900; font-size:9.5pt; color:#1e293b">${fmtNum(lineTotal)}</td>
+                </tr>`;
+            }).join('');
 
-            // --- اللوجو ---
-            const logo = localStorage.getItem('accu_logo');
-            const printLogoArea = document.getElementById('print-logo-area');
-            const printLogoImg  = document.getElementById('printLogoImg');
-            if (logo) {
-                printLogoImg.src = logo;
-                printLogoArea.style.display = 'block';
+            // ---- الختم المائي ----
+            const stampClr = status==='paid' ? 'rgba(16,185,129,0.13)' : status==='unpaid' ? 'rgba(239,68,68,0.13)' : 'rgba(100,116,139,0.13)';
+
+            // ---- هيدر الفاتورة (داخل thead — يتكرر في كل صفحة) ----
+            const headerHTML = `
+            <div style="background:linear-gradient(135deg,#e0e7ff,#c7d2fe); padding:16px 20px 14px; -webkit-print-color-adjust:exact; print-color-adjust:exact">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px">
+                    <div style="display:flex; align-items:flex-start; gap:12px">
+                        ${logo ? `<img src="${logo}" style="max-height:60px; max-width:90px; border-radius:8px; background:white; padding:4px; object-fit:contain">` : ''}
+                        <div>
+                            <div style="font-size:22pt; font-weight:900; color:#4f46e5; font-style:italic; line-height:1; font-family:Cairo,sans-serif">AccuFlow</div>
+                            ${sets.seller ? `<div style="font-size:11pt; font-weight:700; color:#1e293b; text-transform:uppercase; margin-top:3px; font-family:Cairo,sans-serif">${sets.seller}</div>` : ''}
+                            <div style="font-size:7pt; font-weight:900; color:#6366f1; text-transform:uppercase; letter-spacing:3px; margin-top:2px; font-family:Cairo,sans-serif">${t.invoiceTitle||'TAX INVOICE'}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px">
+                        ${qrDataUrl ? `<img src="${qrDataUrl}" style="width:65px;height:65px; border-radius:8px; background:white; padding:3px">` : ''}
+                        <span style="display:inline-block; padding:3px 10px; border-radius:999px; font-size:8pt; font-weight:900; text-transform:uppercase; background:${sBg}; color:${sClr}; font-family:Cairo,sans-serif">${statusLbl}</span>
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:10px; flex-wrap:wrap; gap:8px">
+                    <div>
+                        <div style="font-size:7pt; font-weight:900; color:#6366f1; text-transform:uppercase; letter-spacing:2px; font-family:Cairo,sans-serif">${t.buyerLabel||'Customer'}</div>
+                        <div style="font-size:13pt; font-weight:900; color:#1e293b; margin-top:2px; font-family:Cairo,sans-serif">${client}</div>
+                        ${dueDate ? `<div style="font-size:7.5pt; color:#475569; margin-top:2px; font-family:Cairo,sans-serif">${t.dueDateLabel||'Due'}: ${dueDate}</div>` : ''}
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-size:7.5pt; font-weight:900; color:#6366f1; text-transform:uppercase; letter-spacing:2px; font-family:Cairo,sans-serif">${t.invNo||'INV NO'}</div>
+                        <div style="font-size:14pt; font-weight:900; color:#1e293b; font-family:Cairo,sans-serif">${invId}</div>
+                        <div style="font-size:7.5pt; color:#475569; font-style:italic; font-family:Cairo,sans-serif">${dateStr}</div>
+                    </div>
+                </div>
+            </div>`;
+
+            // ---- بناء HTML الكامل للطباعة ----
+            const html = `<!DOCTYPE html>
+<html lang="${state.lang==='ar'?'ar':'en'}" dir="${state.lang==='ar'?'rtl':'ltr'}">
+<head>
+<meta charset="UTF-8">
+<title>${t.invoiceTitle||'Invoice'} ${invId}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+    @page { size:A4 portrait; margin:0; }
+    body { font-family:'Cairo',sans-serif; background:white; color:#1e293b; padding:10mm 8mm; }
+
+    /* ===== الجدول الرئيسي: thead يتكرر في كل صفحة ===== */
+    table.inv-main { width:100%; border-collapse:collapse; table-layout:fixed; }
+    table.inv-main thead { display:table-header-group; }
+    table.inv-main tbody { display:table-row-group; }
+    table.inv-main tfoot { display:table-footer-group; }
+    table.inv-main td   { padding:0; border:none; vertical-align:top; }
+
+    /* تأكيد تكرار الهيدر في كل المتصفحات */
+    @media print {
+        table.inv-main { page-break-inside:auto; }
+        table.inv-main tr { page-break-inside:avoid; }
+        table.inv-main thead { display:table-header-group !important; }
+        table.inv-main tbody { display:table-row-group !important; }
+    }
+
+    .body-pad { padding:14px 18px; }
+
+    /* جدول البنود */
+    table.items { width:100%; border-collapse:collapse; margin-top:8px; }
+    table.items th { padding:6px; font-size:8pt; font-weight:900; text-transform:uppercase; letter-spacing:1.5px; color:#94a3b8; border-bottom:2px solid #e2e8f0; text-align:right; }
+    table.items th:last-child { text-align:right; }
+    table.items tr { page-break-inside:avoid; }
+
+    .info-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; padding-bottom:14px; border-bottom:1px solid #f1f5f9; margin-bottom:14px; }
+    .info-lbl  { font-size:7.5pt; font-weight:900; text-transform:uppercase; color:#94a3b8; letter-spacing:1.5px; margin-bottom:3px; }
+    .info-val  { font-size:11pt; font-weight:900; color:#1e293b; }
+
+    .totals-box { max-width:280px; margin-left:auto; margin-top:16px; border-top:2px solid #6366f1; padding-top:10px; page-break-inside:avoid; }
+    .tot-row    { display:flex; justify-content:space-between; font-size:9pt; font-weight:700; color:#94a3b8; margin-bottom:5px; }
+    .tot-row.grand { margin-top:8px; border-top:1px solid #e2e8f0; padding-top:8px; }
+    .tot-row.grand .lbl { font-size:9pt; font-weight:900; color:#4f46e5; text-transform:uppercase; }
+    .tot-row.grand .val { font-size:18pt; font-weight:900; color:#1e293b; line-height:1; }
+
+    .notes-box { margin-top:14px; padding:10px 12px; background:#f8fafc; border-radius:8px; font-size:8.5pt; color:#475569; border:1px solid #e2e8f0; page-break-inside:avoid; }
+
+    .footer-strip { background:#f8fafc; border-top:1px solid #e2e8f0; padding:10px 18px; text-align:center; font-size:7.5pt; color:#94a3b8; font-style:italic; }
+
+    .watermark {
+        position:fixed; top:50%; left:50%;
+        transform:translate(-50%,-50%) rotate(-30deg);
+        font-size:80pt; font-weight:900; letter-spacing:15px;
+        text-transform:uppercase; color:${stampClr};
+        border:8px solid ${stampClr}; padding:10px 40px;
+        border-radius:12px; white-space:nowrap; pointer-events:none;
+        z-index:9999;
+    }
+</style>
+</head>
+<body>
+
+<div class="watermark">${statusLbl}</div>
+
+<table class="inv-main">
+
+    <!-- ██████ HEADER — يتكرر في كل صفحة ██████ -->
+    <thead>
+    <tr><td>${headerHTML}</td></tr>
+    </thead>
+
+    <!-- ██████ BODY — يمتد عبر الصفحات ██████ -->
+    <tbody>
+    <tr><td>
+        <div class="body-pad">
+
+            <!-- معلومات الفاتورة -->
+            <div class="info-grid">
+                <div>
+                    <div class="info-lbl">${t.buyerLabel||'Customer'}</div>
+                    <div class="info-val">${client}</div>
+                </div>
+                <div>
+                    <div class="info-lbl">${t.dateLabel||'Date Issued'}</div>
+                    <div class="info-val" style="font-size:9.5pt">${dateStr}</div>
+                </div>
+                <div>
+                    <div class="info-lbl">${t.dueDateLabel||'Due Date'}</div>
+                    <div class="info-val" style="font-size:9.5pt">${dueDate||'—'}</div>
+                </div>
+            </div>
+
+            <!-- جدول البنود -->
+            <table class="items">
+                <thead>
+                    <tr>
+                        <th style="text-align:left; width:45%">${t.thDesc||'Description'}</th>
+                        <th style="text-align:center; width:10%">${t.thUnit||'Unit'}</th>
+                        <th style="text-align:center; width:10%">${t.thQty||'Qty'}</th>
+                        <th style="text-align:center; width:15%">${t.thPrice||'Price'}</th>
+                        <th style="text-align:right; width:20%">${t.thTotal||'Total'}</th>
+                    </tr>
+                </thead>
+                <tbody>${itemRows}</tbody>
+            </table>
+
+            <!-- الإجماليات -->
+            <div class="totals-box">
+                <div class="tot-row">
+                    <span>${t.subtotalLabel||'Net Amount:'}</span>
+                    <span>${fmtNum(sub)} ${sets.curr}</span>
+                </div>
+                <div class="tot-row">
+                    <span>${sets.taxN||'Tax'} (${sets.taxR}%):</span>
+                    <span>${fmtNum(tax)} ${sets.curr}</span>
+                </div>
+                <div class="tot-row grand">
+                    <span class="lbl">Grand Total</span>
+                    <span class="val">${fmtNum(tot)} <small style="font-size:10pt">${sets.curr}</small></span>
+                </div>
+            </div>
+
+            ${notes ? `<div class="notes-box"><strong>${t.notesLabel||'Notes'}:</strong> ${notes}</div>` : ''}
+
+        </div>
+    </td></tr>
+    </tbody>
+
+    <!-- ██████ FOOTER ██████ -->
+    <tfoot>
+    <tr><td>
+        <div class="footer-strip">
+            AccuFlow ERP &nbsp;|&nbsp; ${sets.seller||''} &nbsp;|&nbsp; ${state.lang === 'ar' ? `فاتورة رقم ${invId}` : `${t.invoiceTitle||'Tax Invoice'} ${invId}`}
+            ${sets.vat ? `&nbsp;|&nbsp; ${sets.vat}` : ''}
+        </div>
+    </td></tr>
+    </tfoot>
+
+</table>
+
+<script>window.onload = function(){ window.print(); }<\/script>
+</body>
+</html>`;
+
+            // Try popup first
+            let win;
+            try { win = window.open('', '_blank', 'width=900,height=700'); } catch(e) {}
+            if (win) {
+                win.document.write(html);
+                win.document.close();
+                win.onafterprint = function(){ try { win.close(); } catch(e) {} };
             } else {
-                printLogoArea.style.display = 'none';
+                // Popup blocked — inject into page temporarily
+                const wrap = document.createElement('div');
+                wrap.id = '_accuPrintWrap';
+                wrap.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:999999;background:white;overflow:auto;';
+                wrap.innerHTML = html;
+                document.body.appendChild(wrap);
+                window.print();
+                document.body.removeChild(wrap);
             }
-
-            // --- الملاحظات في نهاية الفاتورة ---
-            const notes = document.getElementById('invNotes').value.trim();
-            const notesArea = document.getElementById('printNotesArea');
-            if (notes) {
-                document.getElementById('printNotesLabel').innerText = (t.notesLabel || 'Notes') + ': ';
-                document.getElementById('printNotesText').innerText  = notes;
-                notesArea.classList.remove('hidden');
-            } else {
-                notesArea.classList.add('hidden');
-            }
-
-            // --- إظهار هيدر الطباعة وإخفاء هيدر الشاشة مؤقتاً ---
-            document.querySelector('.print-inv-header').style.display = 'block';
-
-            window.print();
         }
 
         function updateStamp() {
