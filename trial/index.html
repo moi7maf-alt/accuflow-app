@@ -1,0 +1,1313 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir="ltr" id="mainHtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AccuFlow ERP - SaaS Standard Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #f8fafc; --text: #1e293b; --card: #ffffff; --sidebar: #f1f5f9; --border: #e2e8f0; --hover: #ffffff; }
+        .dark-mode { --bg: #0f172a; --text: #e2e8f0; --card: #1e293b; --sidebar: #1e293b; --border: #334155; --hover: #334155; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg); color: var(--text); overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        .active-nav { background-color: var(--hover) !important; color: #6366f1 !important; border-right: 4px solid #6366f1; font-weight: 900; }
+        .active-nav-en { border-left: 4px solid #6366f1 !important; border-right: 0 !important; }
+        .ltr { dir: ltr !important; text-align: left !important; }
+        .rtl { dir: rtl !important; text-align: right !important; }
+        .dark-mode .bg-slate-50, .dark-mode .bg-slate-100 { background-color: #1e293b !important; }
+        .dark-mode .text-slate-800, .dark-mode .text-slate-900 { color: #e2e8f0 !important; }
+        .dark-mode .text-slate-400, .dark-mode .text-slate-500 { color: #94a3b8 !important; }
+        .dark-mode .bg-white { background-color: #1e293b !important; }
+        .dark-mode .border-slate-100, .dark-mode .border-slate-200 { border-color: #334155 !important; }
+        .dark-mode .shadow-sm, .dark-mode .shadow-lg, .dark-mode .shadow-xl { box-shadow: 0 0 0 1px #334155 !important; }
+        .dark-mode aside { background-color: #1e293b !important; border-color: #334155 !important; }
+        .dark-mode input, .dark-mode select { background-color: #0f172a !important; color: #e2e8f0 !important; border-color: #334155 !important; }
+        .dark-mode .bg-indigo-50 { background-color: #1e1b4b !important; }
+        .dark-mode .bg-emerald-50 { background-color: #022c22 !important; }
+        .dark-mode .text-indigo-800 { color: #a5b4fc !important; }
+        .dark-mode .text-emerald-800 { color: #6ee7b7 !important; }
+
+        /* رأس الفاتورة للشاشة */
+        .accounting-header { background: linear-gradient(135deg, #4f46e5, #6366f1); }
+        .dark-mode .accounting-header { background: linear-gradient(135deg, #3730a3, #4338ca); }
+
+        /* الختم المائي - يظهر حالة الفاتورة بشكل احترافي */
+        .watermark-stamp {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            border: 8px solid; padding: 20px 80px; font-size: 5rem; font-weight: 900;
+            z-index: 9999; opacity: 0.12; pointer-events: none; border-radius: 16px; display: none;
+            text-transform: uppercase; letter-spacing: 15px; white-space: nowrap;
+            line-height: 1;
+        }
+
+        .app-select { appearance: none; -webkit-appearance: none; -moz-appearance: none; background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 12px center !important; background-size: 16px !important; border: 2px solid #6366f1 !important; color: #1e293b !important; font-weight: 700 !important; padding: 12px 40px 12px 16px !important; border-radius: 16px !important; outline: none !important; cursor: pointer !important; box-shadow: 0 2px 8px rgba(99,102,241,0.15) !important; }
+        .app-input { border: 2px solid #cbd5e1 !important; background: #ffffff !important; color: #1e293b !important; font-weight: 700 !important; padding: 12px 16px !important; border-radius: 16px !important; outline: none !important; }
+        .app-input:focus { border-color: #6366f1 !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.15) !important; }
+        .dark-mode .app-input { background: #1e293b !important; border-color: #475569 !important; color: #e2e8f0 !important; }
+        .app-select option { background: #ffffff !important; color: #1e293b !important; font-weight: 700 !important; }
+        .dark-mode .app-select { background: #1e293b url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23818cf8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 12px center !important; background-size: 16px !important; border-color: #6366f1 !important; color: #e2e8f0 !important; }
+        .dark-mode .app-select option { background: #1e293b !important; color: #e2e8f0 !important; }
+
+        .app-select-sm { appearance: none; -webkit-appearance: none; -moz-appearance: none; background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 8px center !important; background-size: 12px !important; border: 2px solid #6366f1 !important; color: #1e293b !important; font-weight: 700 !important; padding: 6px 28px 6px 10px !important; border-radius: 10px !important; outline: none !important; cursor: pointer !important; }
+        .app-select-sm option { background: #ffffff !important; color: #1e293b !important; font-weight: 700 !important; }
+        .dark-mode .app-select-sm { background: #1e293b url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23818cf8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 8px center !important; background-size: 12px !important; border-color: #6366f1 !important; color: #e2e8f0 !important; }
+        .dark-mode .app-select-sm option { background: #1e293b !important; color: #e2e8f0 !important; }
+
+        /* ====================================================
+           PRINT STYLES — هيدر ثابت في كل صفحة
+           ==================================================== */
+        @media print {
+            @page { size: A4 portrait; margin: 8mm 10mm; }
+
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+            .no-print { display: none !important; }
+
+            /* إخفاء كل شيء غير الفاتورة */
+            body { background: white !important; }
+            aside, #sec-dashboard, #sec-clients, #sec-history, #sec-settings { display: none !important; }
+            main { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+            #sec-invoicing { display: block !important; padding: 0 !important; }
+
+            /* منطقة الطباعة */
+            .print-area {
+                width: 100% !important;
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+            }
+
+            /* ===== الجدول الرئيسي للفاتورة — هيكل thead/tbody =====
+               thead = table-header-group → يتكرر تلقائياً في كل صفحة
+               tbody = table-row-group  → يمتد عبر الصفحات          */
+            .inv-page-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                table-layout: fixed !important;
+            }
+            .inv-page-table thead { display: table-header-group !important; }
+            .inv-page-table tbody { display: table-row-group !important; }
+            .inv-page-table tfoot { display: table-footer-group !important; }
+            .inv-page-table tr  { break-inside: avoid !important; }
+            .inv-page-table td  { padding: 0 !important; border: none !important; vertical-align: top !important; }
+
+            /* === هيدر الفاتورة (يظهر في كل صفحة) === */
+            .print-inv-header {
+                background: #f0f4ff !important;
+                border-bottom: 3px solid #6366f1 !important;
+                padding: 4mm 6mm 4mm !important;
+                display: block !important;
+                width: 100% !important;
+            }
+            .print-inv-header h1 { color: #4f46e5 !important; font-size: 22pt !important; font-weight: 900 !important; }
+            .print-inv-header .seller-name { color: #1e293b !important; }
+            .print-inv-header .inv-meta { color: #475569 !important; }
+
+            /* هيدر الشاشة يُخفى أثناء الطباعة */
+            .accounting-header { display: none !important; }
+
+            /* هيدر الطباعة يظهر في كل صفحة عبر thead */
+            .print-inv-header { display: block !important; }
+
+            /* === محتوى الصفحة === */
+            .print-inv-body {
+                padding: 4mm 6mm !important;
+                display: block !important;
+            }
+
+            /* === فوتر الإجماليات (يبقى مع آخر صفحة) === */
+            .total-divider {
+                border-top: 2px solid #6366f1 !important;
+                margin-top: 4mm !important;
+                padding-top: 3mm !important;
+                page-break-inside: avoid !important;
+            }
+
+            /* إجبار ظهور اللوجو والباركود */
+            #logoImage { display: block !important; max-height: 70px !important; visibility: visible !important; }
+            #print-logo-area { display: block !important; }
+            #qrcode canvas, #qrcode img { display: block !important; width: 75px !important; height: 75px !important; }
+
+            /* الختم المائي */
+            .watermark-stamp {
+                display: block !important;
+                position: fixed !important;
+                top: 50% !important; left: 50% !important;
+                transform: translate(-50%, -50%) rotate(-30deg) !important;
+                opacity: 0.08 !important;
+            }
+
+            /* جدول البنود */
+            .items-print-table { width: 100% !important; border-collapse: collapse !important; }
+            .items-print-table th, .items-print-table td { font-size: 9pt !important; }
+            .items-print-table tbody tr { break-inside: avoid !important; }
+
+            input, select, textarea { border: none !important; background: transparent !important; color: #1e293b !important; }
+        }
+    </style>
+</head>
+<body class="flex min-h-screen ltr">
+
+    <!-- Sidebar القائمة الجانبية -->
+    <aside class="no-print w-64 bg-slate-50 border-slate-200 border-l flex flex-col fixed h-full z-50 shadow-sm" id="sidebar">
+        <div class="p-8">
+            <!-- محول اللغة -->
+            <div class="mb-8">
+                <p class="text-[10px] font-black text-slate-400 mb-2 text-center uppercase tracking-tighter">Language</p>
+                <select onchange="switchLang(this.value)" class="app-select-sm w-full text-xs">
+                    <option value="en">🇬🇧 English</option>
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="ar">🇸🇦 العربية</option>
+                </select>
+            </div>
+
+            <div class="flex items-center gap-3 mb-10 justify-center">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black shadow-lg">A</div>
+                <h1 class="text-xl font-black text-indigo-900 italic uppercase">AccuFlow</h1>
+            </div>
+
+            <nav class="space-y-2 font-bold text-sm text-slate-500">
+                <button onclick="showSection('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 p-4 rounded-2xl hover:bg-white active-nav transition-all">📊 <span data-i18n="navDash">Dashboard</span></button>
+                <button onclick="showSection('clients')" id="nav-clients" class="nav-btn w-full flex items-center gap-3 p-4 rounded-2xl hover:bg-white transition-all">👥 <span data-i18n="navClients">Clients</span></button>
+                <button onclick="prepareNewInvoice()" id="nav-invoicing" class="nav-btn w-full flex items-center gap-3 p-4 rounded-2xl hover:bg-white transition-all">📄 <span data-i18n="navInv">New Invoice</span></button>
+                <button onclick="showSection('history')" id="nav-history" class="nav-btn w-full flex items-center gap-3 p-4 rounded-2xl hover:bg-white transition-all">📂 <span data-i18n="navHistory">Archives</span></button>
+                <button onclick="showSection('settings')" id="nav-settings" class="nav-btn w-full flex items-center gap-3 p-4 rounded-2xl hover:bg-white transition-all">⚙️ <span data-i18n="navSettings">Settings</span></button>
+            </nav>
+            <div class="mt-6 px-4">
+                <button onclick="toggleDark()" id="darkToggle" class="w-full flex items-center gap-3 p-4 rounded-2xl text-xs font-bold text-slate-400 hover:bg-white transition-all">🌙 <span data-i18n="darkMode">Dark Mode</span></button>
+
+            </div>
+        </div>
+        <div class="mt-auto p-6 border-t"><button onclick="resetSystem()" class="text-[10px] text-rose-400 font-bold hover:underline italic uppercase" data-i18n="resetBtn">RESET SYSTEM</button></div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-grow transition-all p-10" id="mainContent">
+        <!-- Dashboard -->
+        <section id="sec-dashboard" class="space-y-8">
+            <header class="flex justify-between items-end italic"><h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter" data-i18n="dashTitle">Perfectly Managed</h2><div id="topDate" class="text-indigo-500 font-bold text-sm bg-white px-5 py-2 rounded-2xl shadow-sm border border-slate-100 italic"></div></header>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-right font-black italic shadow-sm">
+                <div class="bg-emerald-50 p-6 rounded-[2rem] border border-emerald-100 shadow-sm"><span class="text-[10px] uppercase" data-i18n="totalSales">Total Sales</span><p id="dashSales" class="text-3xl mt-1 tracking-tighter text-emerald-800">0.00</p></div>
+                <div class="bg-indigo-50 p-6 rounded-[2rem] border border-indigo-100 shadow-sm"><span class="text-[10px] uppercase" data-i18n="invCount">Invoices</span><p id="dashCount" class="text-3xl mt-1 tracking-tighter text-indigo-800">0</p></div>
+                <div class="bg-amber-50 p-6 rounded-[2rem] border border-amber-100 shadow-sm"><span class="text-[10px] uppercase" data-i18n="outstanding">Outstanding</span><p id="dashOutstanding" class="text-3xl mt-1 tracking-tighter text-amber-800">0.00</p></div>
+                <div class="bg-rose-50 p-6 rounded-[2rem] border border-rose-100 shadow-sm"><span class="text-[10px] uppercase" data-i18n="overdueAmt">Overdue</span><p id="dashOverdue" class="text-3xl mt-1 tracking-tighter text-rose-800">0.00</p></div>
+            </div>
+            <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
+                <canvas id="revenueChart" height="200"></canvas>
+            </div>
+        </section>
+
+        <!-- Clients Section -->
+        <section id="sec-clients" class="hidden space-y-8">
+            <div class="flex justify-between items-center italic font-black uppercase"><h2 class="text-3xl font-black text-slate-800" data-i18n="clientsTitle">Clients</h2><button onclick="showClientForm()" class="bg-indigo-600 text-white px-8 py-3 rounded-2xl text-xs shadow-lg italic">➕ <span data-i18n="addClient">Add Client</span></button></div>
+            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden font-bold italic text-sm">
+                <table class="w-full text-right border-collapse">
+                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase border-b tracking-widest italic"><th class="p-6">#</th><th class="p-6" data-i18n="clientName">Name</th><th class="p-6" data-i18n="clientPhone">Phone</th><th class="p-6" data-i18n="clientEmail">Email</th><th class="p-6" data-i18n="clientTaxId">Tax ID</th><th class="p-6 text-center" data-i18n="thAction">Action</th></thead>
+                    <tbody id="clientsList" class="divide-y divide-slate-50"></tbody>
+                </table>
+            </div>
+            <!-- Client Form Modal -->
+            <div id="clientModal" class="hidden fixed inset-0 bg-black/40 z-[99999] flex items-center justify-center p-4" onclick="if(event.target===this)closeClientForm()">
+                <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-md w-full border">
+                    <h3 class="text-2xl font-black italic mb-6" data-i18n="clientInfo">Client Information</h3>
+                    <div class="space-y-4">
+<input id="cfName" type="text" data-i18n-placeholder="clientNamePH" class="w-full app-input">
+
+                        <div class="flex gap-2 items-center">
+                            <span id="cfPhoneCode" class="px-3 py-3 bg-indigo-50 text-indigo-700 rounded-xl font-black text-sm border border-indigo-200">+1</span>
+                            <input id="cfPhone" type="text" data-i18n-placeholder="clientPhonePH" class="flex-1 app-input">
+                        </div>
+
+                        <input id="cfEmail" type="email" data-i18n-placeholder="clientEmailPH" class="w-full app-input">
+
+                        <input id="cfTax" type="text" data-i18n-placeholder="clientTaxPH" class="w-full app-input">
+
+                        <input id="cfAddr" type="text" data-i18n-placeholder="clientAddrPH" class="w-full app-input">
+                    </div>
+                    <div class="flex gap-4 mt-6">
+                        <button onclick="closeClientForm()" class="flex-1 p-4 rounded-2xl font-black text-slate-400 bg-slate-50 border" data-i18n="cancelBtn">Cancel</button>
+                        <button onclick="saveClient()" id="clientSaveBtn" class="flex-1 p-4 rounded-2xl font-black bg-indigo-600 text-white shadow-lg" data-i18n="saveClientBtn">Save Client</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Invoicing Section -->
+        <section id="sec-invoicing" class="hidden">
+
+            <!-- ختم الحالة المائي -->
+            <div id="statusWatermark" class="watermark-stamp">PAID</div>
+
+            <!-- ============================================================
+                 inv-page-table: الجدول الرئيسي للفاتورة
+                 thead يتكرر تلقائياً في كل صفحة عند الطباعة
+                 ============================================================ -->
+            <table class="inv-page-table w-full print-area bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-5xl mx-auto" id="invoice-printable" style="border-collapse:collapse; table-layout:fixed">
+
+                <!-- ===================== HEADER يتكرر في كل صفحة ===================== -->
+                <thead>
+                <tr>
+                <td style="padding:0; border:none; width:100%">
+
+                    <!-- ---- هيدر الشاشة (ملوّن) ---- -->
+                    <div class="accounting-header p-6 sm:p-8 text-white border-b-4 border-indigo-700">
+                        <div class="flex justify-between items-start gap-4 flex-nowrap">
+                            <div class="flex items-start gap-4 min-w-0 shrink">
+                                <div class="shrink-0">
+                                    <div class="no-print cursor-pointer bg-white/10 p-2 rounded-xl border border-white/20 hover:bg-white/20 transition-all" onclick="document.getElementById('logoInput').click()" title="Upload Logo">
+                                        <span id="logoText" class="text-[8px] font-black uppercase text-blue-300" data-i18n="uploadLogo">LOGO</span>
+                                        <input type="file" id="logoInput" class="hidden" accept="image/*" onchange="handleLogo(event)">
+                                    </div>
+                                    <div id="logoPreview" class="flex items-center gap-1 mt-1">
+                                        <img id="logoImage" class="hidden max-h-[80px] rounded bg-white p-1 shadow-sm">
+                                        <button id="removeLogoBtn" onclick="removeLogo()" class="hidden no-print text-rose-300 hover:text-rose-500 text-[10px]">✕</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h1 class="text-2xl sm:text-3xl font-black italic tracking-tighter text-blue-400 leading-none">AccuFlow</h1>
+                                    <p id="sellerNameHeader" class="text-white font-bold text-base sm:text-lg mt-1 uppercase tracking-tighter"></p>
+                                    <p class="text-slate-300 font-bold text-[9px] uppercase tracking-widest mt-1 italic" data-i18n="invoiceTitle">TAX INVOICE</p>
+                                </div>
+                            </div>
+                            <div class="bg-white p-1 rounded-xl shadow-xl shrink-0"><div id="qrcode" style="width:70px;height:70px"></div></div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 mt-4">
+                            <div class="no-print flex items-center gap-2">
+                                <span class="text-[8px] font-black text-blue-300 uppercase">Status:</span>
+                                <select id="invStatus" onchange="updateStamp()" class="app-select-sm text-[11px]">
+                                    <option value="paid"   data-i18n="paid">Paid</option>
+                                    <option value="unpaid" data-i18n="unpaid" selected>Unpaid</option>
+                                    <option value="draft"  data-i18n="draft">Draft</option>
+                                </select>
+                            </div>
+                            <div class="text-right w-full sm:w-auto space-y-2">
+                                <span id="invStatusBadge" class="inline-block px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider shadow-sm bg-slate-500 text-white"></span>
+                                <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/10 text-center font-black">
+                                    <span class="text-[8px] font-black text-blue-300 uppercase tracking-tighter" data-i18n="invNo">INV NO</span>
+                                    <input id="invId" type="text" class="bg-transparent font-black text-base sm:text-lg w-24 outline-none text-white text-center">
+                                </div>
+                                <p id="invDateNow" class="text-[10px] font-bold text-slate-400 italic"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ---- هيدر الطباعة (أبيض — يتكرر في كل صفحة) ---- -->
+                    <div class="print-inv-header" style="display:none; padding:6mm 10mm 4mm; border-bottom:3px solid #6366f1; background:#f0f4ff">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px">
+                            <div style="display:flex; align-items:flex-start; gap:12px">
+                                <div id="print-logo-area" style="display:none">
+                                    <img id="printLogoImg" style="max-height:60px; border-radius:6px; background:white; padding:3px">
+                                </div>
+                                <div>
+                                    <div style="font-size:20pt; font-weight:900; color:#4f46e5; font-style:italic; line-height:1">AccuFlow</div>
+                                    <div id="printSellerName" style="font-size:11pt; font-weight:700; color:#1e293b; text-transform:uppercase; margin-top:3px"></div>
+                                    <div id="printInvTitle" style="font-size:7pt; font-weight:900; color:#6366f1; text-transform:uppercase; letter-spacing:3px; margin-top:2px">TAX INVOICE</div>
+                                </div>
+                            </div>
+                            <div style="text-align:right">
+                                <div id="printQr" style="width:65px;height:65px; background:white; border-radius:8px; padding:3px; display:none"></div>
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:8px; flex-wrap:wrap; gap:8px">
+                            <div>
+                                <span id="printClientLabel" style="font-size:7pt; font-weight:900; color:#6366f1; text-transform:uppercase; letter-spacing:2px"></span>
+                                <div id="printClientName"  style="font-size:12pt; font-weight:900; color:#1e293b; margin-top:2px"></div>
+                            </div>
+                            <div style="text-align:right">
+                                <span id="printStatusBadge" style="display:inline-block; padding:3px 10px; border-radius:999px; font-size:8pt; font-weight:900; text-transform:uppercase; background:#e0e7ff; color:#4f46e5; margin-bottom:4px"></span><br>
+                                <span style="font-size:8pt; font-weight:900; color:#6366f1; text-transform:uppercase; letter-spacing:2px" id="printInvNoLabel">INV NO </span>
+                                <span id="printInvNo" style="font-size:11pt; font-weight:900; color:#1e293b"></span><br>
+                                <span id="printDateStr" style="font-size:8pt; color:#64748b; font-style:italic"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </td>
+                </tr>
+                </thead>
+
+                <!-- ===================== BODY يمتد عبر الصفحات ===================== -->
+                <tbody>
+                <tr>
+                <td style="padding:0; border:none; vertical-align:top">
+
+                    <div class="p-6 sm:p-8 italic font-bold">
+
+                        <!-- Client + Dates -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-slate-100 pb-5 mb-6">
+                            <div class="space-y-2">
+                                <span class="text-[10px] font-black uppercase text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full italic tracking-widest" data-i18n="buyerLabel">Customer</span>
+                                <div class="flex gap-2 items-center">
+                                    <input id="cName" type="text" list="clientDatalist" data-i18n-placeholder="clientPlaceholder" class="flex-1 text-base sm:text-lg font-black bg-transparent border-b-2 border-slate-50 focus:border-indigo-400 outline-none pb-1 min-w-0">
+                                    <datalist id="clientDatalist"></datalist>
+                                    <button onclick="showClientSelector()" class="no-print text-indigo-400 hover:text-indigo-600 text-lg shrink-0">📇</button>
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                <span class="text-[10px] font-black uppercase text-slate-400" data-i18n="dateLabel">Date Issued</span>
+                                <p id="invDateFull" class="text-base sm:text-lg font-black text-slate-800 tracking-tighter"></p>
+                            </div>
+                            <div class="space-y-1">
+                                <span class="text-[10px] font-black uppercase text-slate-400" data-i18n="dueDateLabel">Due Date</span>
+                                <input type="date" id="invDueDate" class="w-full bg-slate-50 rounded-xl p-2 border outline-none font-bold text-sm">
+                            </div>
+                        </div>
+
+                        <!-- Items Table -->
+                        <div class="overflow-x-auto -mx-6 sm:-mx-8 px-6 sm:px-8">
+                            <table class="w-full text-right border-collapse min-w-[500px]">
+                                <thead>
+                                    <tr class="text-slate-400 text-[10px] font-black uppercase border-b-2 tracking-widest italic">
+                                        <th class="pb-4" data-i18n="thDesc">Description</th>
+                                        <th class="pb-4 text-center w-14" data-i18n="thUnit">Unit</th>
+                                        <th class="pb-4 text-center w-14" data-i18n="thQty">Qty</th>
+                                        <th class="pb-4 text-center w-24" data-i18n="thPrice">Price</th>
+                                        <th class="pb-4 text-left pl-4 w-28" data-i18n="thTotal">Total</th>
+                                        <th class="pb-4 w-8 no-print"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="itemsList" class="divide-y divide-slate-100 text-sm"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex flex-wrap gap-3 no-print mt-5">
+                            <button onclick="addItem()" class="bg-slate-50 text-slate-400 px-5 py-2 rounded-xl font-black text-[10px] border shadow-sm hover:bg-slate-100 transition">+ <span data-i18n="addItemBtn">Add Item</span></button>
+                            <button onclick="calc()" class="bg-amber-50 text-amber-600 px-5 py-2 rounded-xl font-black text-[10px] shadow-sm italic hover:bg-amber-100 transition">🔄 <span data-i18n="refreshBtn">Refresh</span></button>
+                        </div>
+
+                        <!-- Notes + Payment -->
+                        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 no-print">
+                            <div>
+                                <span class="text-[10px] font-black uppercase text-slate-400" data-i18n="notesLabel">Notes / Terms</span>
+                                <textarea id="invNotes" rows="2" class="w-full app-input text-sm mt-1" data-i18n-placeholder="notesPH"></textarea>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-black uppercase text-slate-400" data-i18n="paymentLabel">Payment Method</span>
+                                <select id="invPayMethod" class="app-select w-full text-sm mt-1">
+                                    <option value="bank"   data-i18n="bankTransfer">Bank Transfer</option>
+                                    <option value="cash"   data-i18n="cash">Cash</option>
+                                    <option value="card"   data-i18n="card">Card</option>
+                                    <option value="cheque" data-i18n="cheque">Cheque</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Totals -->
+                        <div class="mt-6 pt-5 total-divider">
+                            <div class="flex flex-col items-end">
+                                <div class="w-full max-w-xs space-y-1">
+                                    <div class="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-slate-400 italic">
+                                        <span data-i18n="subtotalLabel">Net Amount:</span>
+                                        <span id="vSub">0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-xs font-bold border-b border-slate-100 pb-2 uppercase tracking-widest text-slate-400 italic">
+                                        <span id="lblTax">Tax:</span>
+                                        <span id="vTax">0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center pt-2">
+                                        <span class="text-indigo-600 text-[10px] font-black uppercase tracking-tighter">Grand Total</span>
+                                        <div class="flex items-baseline gap-1 font-black leading-none text-slate-900">
+                                            <span id="vTot" class="text-2xl sm:text-3xl tracking-tighter">0.00</span>
+                                            <span class="currency-label text-[10px] text-indigo-600"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notes for print -->
+                        <div id="printNotesArea" class="hidden mt-4 pt-4 border-t border-slate-100 text-sm text-slate-500">
+                            <strong id="printNotesLabel"></strong>
+                            <span id="printNotesText"></span>
+                        </div>
+
+                    </div><!-- /p-6 -->
+
+                </td>
+                </tr>
+                </tbody>
+
+                <!-- ===================== FOOTER أزرار الإجراءات ===================== -->
+                <tfoot class="no-print">
+                <tr>
+                <td style="padding:0; border:none">
+                    <div class="p-4 sm:p-6 bg-slate-50 border-t rounded-b-3xl flex flex-col sm:flex-row gap-2">
+                        <button onclick="saveInvoice()"   class="flex-1 bg-indigo-600 text-white py-3.5 rounded-2xl font-black shadow-lg shadow-indigo-300 hover:bg-indigo-700 text-xs transition" data-i18n="saveBtn">🚀 Issue &amp; Record</button>
+                        <button onclick="printInvoice()"  class="flex-1 bg-white border-2 border-slate-200 py-3.5 rounded-2xl font-black text-slate-600 shadow-sm hover:bg-slate-100 text-xs transition">🖨️ <span data-i18n="printBtn">Print</span></button>
+                    </div>
+                </td>
+                </tr>
+                </tfoot>
+
+            </table><!-- /inv-page-table -->
+        </section>
+        <!-- History Section -->
+        <section id="sec-history" class="hidden space-y-8">
+            <div class="flex justify-between items-center italic font-black uppercase flex-wrap gap-4">
+                <h2 class="text-3xl font-black text-slate-800" data-i18n="historyTitle">Archives</h2>
+                <div class="flex gap-3">
+                    <button onclick="exportToCSV()" class="bg-emerald-600 text-white px-6 py-3 rounded-2xl text-xs shadow-lg italic">📥 <span data-i18n="exportBtn">Export CSV</span></button>
+                    <button onclick="exportData()" class="bg-indigo-600 text-white px-6 py-3 rounded-2xl text-xs shadow-lg italic">💾 <span data-i18n="backupBtn">Backup</span></button>
+                    <button onclick="document.getElementById('importFile').click()" class="bg-amber-600 text-white px-6 py-3 rounded-2xl text-xs shadow-lg italic">📂 <span data-i18n="restoreBtn">Restore</span></button>
+                    <input type="file" id="importFile" class="hidden" onchange="importData(event)">
+                </div>
+            </div>
+            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden font-bold italic text-sm">
+                <table class="w-full text-right border-collapse">
+                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase border-b tracking-widest italic"><th class="p-6">ID</th><th class="p-6">Date</th><th class="p-6">Due</th><th class="p-6">Client</th><th class="p-6 text-center">Status</th><th class="p-6 text-left pl-10">Total</th><th class="p-6 text-center">Action</th></thead>
+                    <tbody id="fullHistoryList" class="divide-y divide-slate-50 italic"></tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- Settings Section -->
+        <section id="sec-settings" class="hidden space-y-8 font-black italic">
+            <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter" data-i18n="navSettings">Settings</h2>
+            <div class="bg-white p-10 rounded-[2.5rem] border grid grid-cols-2 gap-6 shadow-sm text-sm">
+                <!-- Logo Upload in Settings -->
+                <div class="col-span-2 flex items-center gap-6 p-4 bg-slate-50 rounded-2xl border">
+                    <div class="shrink-0">
+                        <div class="cursor-pointer bg-white p-2 rounded-xl border border-slate-200 hover:bg-slate-100 transition-all" onclick="document.getElementById('logoInputSettings').click()">
+                            <span class="text-[8px] font-black uppercase text-slate-400">📸 <span data-i18n="uploadLogo">LOGO</span></span>
+                            <input type="file" id="logoInputSettings" class="hidden" accept="image/*" onchange="handleLogo(event)">
+                        </div>
+                    </div>
+                    <img id="logoPreviewSettings" class="max-h-[80px] rounded bg-white p-1 shadow-sm border">
+                    <div>
+                        <p class="font-black text-sm text-slate-700" data-i18n="logoLabel">Business Logo</p>
+                        <p class="text-[10px] text-slate-400 font-bold" data-i18n="logoSublabel">Appears on invoices & PDF (max 2MB)</p>
+                        <button id="removeLogoSettingsBtn" onclick="removeLogo()" class="hidden text-[10px] text-rose-500 font-black hover:underline mt-1">✕ <span data-i18n="removeLogo">Remove</span></button>
+                    </div>
+                </div>
+                <div class="col-span-2 flex flex-col gap-2"><span data-i18n="selectCountry">Country / الدولة</span>
+                    <select id="sCountry" onchange="applyCountry()" class="app-select text-base"></select>
+                </div>
+                <div class="flex flex-col gap-2"><span data-i18n="setCurr">Currency</span><select id="sCurr" class="app-select"></select></div>
+                <div class="flex flex-col gap-2"><span data-i18n="setNumFmt">Number Format</span>
+                    <select id="sNumFmt" class="app-select">
+                        <option value="en">1,234.56 (English)</option>
+                        <option value="fr">1 234,56 (Français)</option>
+                        <option value="de">1.234,56 (Deutsch)</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-2"><span data-i18n="invPrefix">Invoice Prefix</span><input id="sInvPrefix" type="text" class="app-input" value="INV-"></div>
+                <div class="flex flex-col gap-2"><span data-i18n="invNextNo">Next Invoice No.</span><input id="sInvNext" type="number" class="app-input" value="1"></div>
+                <div class="flex flex-col gap-2"><span data-i18n="setTaxN">Tax Name</span><input id="sTaxN" type="text" class="app-input"></div>
+                <div class="flex flex-col gap-2"><span data-i18n="setTaxR">Tax Rate %</span><input id="sTaxR" type="number" class="app-input"></div>
+                <div class="flex flex-col gap-2"><span data-i18n="setSeller">Business Name</span><input id="sSeller" type="text" class="app-input"></div>
+                <div class="flex flex-col gap-2 col-span-2"><span data-i18n="setVat">Tax ID / CR No.</span><input id="sVat" type="text" class="app-input"></div>
+                <button onclick="saveSets()" class="col-span-2 bg-indigo-600 text-white py-5 rounded-3xl font-black text-xl shadow-lg mt-2" data-i18n="saveSetBtn">Save Settings</button>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        const i18n = {
+            ar: {
+                navDash: 'لوحة التحكم', navInv: 'فاتورة جديدة', navHistory: 'الأرشيف', navSettings: 'الإعدادات', navClients: 'العملاء',
+                resetBtn: 'إعادة ضبط النظام', langGuide: 'اختر اللغة', darkMode: 'الوضع الليلي',
+                dashTitle: 'نبض الأعمال', totalSales: 'إجمالي المبيعات', invCount: 'عدد الفواتير', outstanding: 'المستحق', overdueAmt: 'متأخر',
+                uploadLogo: 'رفع الشعار', invNo: 'رقم الفاتورة', buyerLabel: 'العميل',
+                dateLabel: 'تاريخ الإصدار', dueDateLabel: 'تاريخ الاستحقاق', invDate: 'تاريخ الفاتورة',
+                thDesc: 'الوصف', thUnit: 'الوحدة', thQty: 'الكمية', thPrice: 'السعر', thTotal: 'الإجمالي',
+                addItemBtn: '+ إضافة بند', subtotalLabel: 'الصافي:', printBtn: '🖨️ طباعة', saveBtn: '🚀 حفظ وترحيل', refreshBtn: '🔄 تحديث',
+                downloadPDF: '📥 تحميل PDF', savePdfBtn: '💾 حفظ وتحميل PDF',
+                historyTitle: 'أرشيف الفواتير', paid: 'مدفوعة', unpaid: 'غير مدفوعة', draft: 'مسودة', overdue: 'متأخرة', cancelled: 'ملغية',
+                alertSaved: 'تم الحفظ بنجاح! ✅',
+                clientPlaceholder: 'اسم العميل', newItem: 'بند جديد', invoiceTitle: 'فاتورة ضريبية', exportBtn: 'تصدير CSV',
+                backupBtn: 'نسخ احتياطي', restoreBtn: 'استعادة',
+                setCurr: 'العملة', setTaxN: 'اسم الضريبة', setTaxR: 'نسبة الضريبة %', setSeller: 'اسم المؤسسة', setVat: 'الرقم الضريبي / السجل التجاري', saveSetBtn: 'حفظ الإعدادات',
+                invPrefix: 'بادئة الفاتورة', invNextNo: 'الرقم التالي', selectCountry: 'اختر الدولة', setNumFmt: 'تنسيق الأرقام',
+                thDate: 'التاريخ', thAction: 'الإجراء',
+                clientsTitle: 'إدارة العملاء', addClient: 'إضافة عميل', clientName: 'الاسم', clientPhone: 'الهاتف', clientEmail: 'البريد', clientTaxId: 'الرقم الضريبي',
+                clientInfo: 'بيانات العميل', cancelBtn: 'إلغاء', saveClientBtn: 'حفظ العميل',
+                clientNamePH: 'اسم العميل الكامل', clientPhonePH: 'رقم الهاتف', clientEmailPH: 'البريد الإلكتروني', clientTaxPH: 'الرقم الضريبي', clientAddrPH: 'العنوان',
+                notesLabel: 'ملاحظات / شروط', notesPH: 'شروط الدفع، ملاحظات...',
+                paymentLabel: 'طريقة الدفع', bankTransfer: 'تحويل بنكي', cash: 'نقداً', card: 'بطاقة', cheque: 'شيك',
+                confirmDelete: 'تأكيد الحذف؟',
+                noClients: 'لا يوجد عملاء بعد', confirmReset: 'سيتم مسح كل البيانات! هل أنت متأكد؟',
+                logoLabel: 'شعار المؤسسة', logoSublabel: 'يظهر في الفواتير و PDF (الحد 2MB)', removeLogo: 'إزالة الشعار',
+
+            },
+            en: {
+                navDash: 'Dashboard', navInv: 'New Invoice', navHistory: 'Archive', navSettings: 'Settings', navClients: 'Clients',
+                resetBtn: 'RESET SYSTEM', langGuide: 'Language', darkMode: 'Dark Mode',
+                dashTitle: 'Your Billings, Perfectly Managed', totalSales: 'Total Sales', invCount: 'Invoices', outstanding: 'Outstanding', overdueAmt: 'Overdue',
+                uploadLogo: 'UPLOAD LOGO', invNo: 'INV NO', buyerLabel: 'Customer',
+                dateLabel: 'Date Issued', dueDateLabel: 'Due Date', invDate: 'Invoice Date',
+                thDesc: 'Description', thUnit: 'Unit', thQty: 'Qty', thPrice: 'Price', thTotal: 'Total',
+                addItemBtn: '+ Add Item', subtotalLabel: 'Net Amount:', printBtn: '🖨️ Print', saveBtn: '🚀 Issue & Record', refreshBtn: '🔄 Refresh',
+                downloadPDF: '📥 Download PDF', savePdfBtn: '💾 Save & Download PDF',
+                historyTitle: 'Invoice Archive', paid: 'Paid', unpaid: 'Unpaid', draft: 'Draft', overdue: 'Overdue', cancelled: 'Cancelled',
+                alertSaved: 'Recorded! ✅',
+                clientPlaceholder: 'Client name', newItem: 'New Item', invoiceTitle: 'Tax Invoice', exportBtn: 'Export CSV',
+                backupBtn: 'Backup', restoreBtn: 'Restore',
+                setCurr: 'Currency', setTaxN: 'Tax Name', setTaxR: 'Tax Rate %', setSeller: 'Business Name', setVat: 'Tax ID / CR No.', saveSetBtn: 'Save Settings',
+                invPrefix: 'Invoice Prefix', invNextNo: 'Next Number', selectCountry: 'Select Country', setNumFmt: 'Number Format',
+                thDate: 'Date', thAction: 'Action',
+                clientsTitle: 'Client Management', addClient: 'Add Client', clientName: 'Name', clientPhone: 'Phone', clientEmail: 'Email', clientTaxId: 'Tax ID',
+                clientInfo: 'Client Information', cancelBtn: 'Cancel', saveClientBtn: 'Save Client',
+                clientNamePH: 'Full name', clientPhonePH: 'Phone number', clientEmailPH: 'Email address', clientTaxPH: 'Tax ID', clientAddrPH: 'Address',
+                notesLabel: 'Notes / Terms', notesPH: 'Payment terms, notes...',
+                paymentLabel: 'Payment Method', bankTransfer: 'Bank Transfer', cash: 'Cash', card: 'Card', cheque: 'Cheque',
+                confirmDelete: 'Confirm delete?',
+                noClients: 'No clients yet', confirmReset: 'This will delete ALL data! Are you sure?',
+                logoLabel: 'Business Logo', logoSublabel: 'Appears on invoices & PDF (max 2MB)', removeLogo: 'Remove',
+
+            },
+            fr: {
+                navDash: 'Tableau de bord', navInv: 'Nouvelle facture', navHistory: 'Archives', navSettings: 'Paramètres', navClients: 'Clients',
+                resetBtn: 'RÉINITIALISER', langGuide: 'Langue', darkMode: 'Mode sombre',
+                dashTitle: 'Votre facturation, parfaitement gérée', totalSales: 'Ventes totales', invCount: 'Factures', outstanding: 'Impayé', overdueAmt: 'En retard',
+                uploadLogo: 'IMPORTER LOGO', invNo: 'FACT N°', buyerLabel: 'Client',
+                dateLabel: 'Date d\'émission', dueDateLabel: 'Date d\'échéance', invDate: 'Date de facture',
+                thDesc: 'Description', thUnit: 'Unité', thQty: 'Qté', thPrice: 'Prix', thTotal: 'Total',
+                addItemBtn: '+ Ajouter un article', subtotalLabel: 'Montant net:', printBtn: '🖨️ Imprimer', saveBtn: '🚀 Émettre', refreshBtn: '🔄 Actualiser',
+                downloadPDF: '📥 Télécharger PDF', savePdfBtn: '💾 Enregistrer & Télécharger PDF',
+                historyTitle: 'Archives des factures', paid: 'Payée', unpaid: 'Impayée', draft: 'Brouillon', overdue: 'En retard', cancelled: 'Annulée',
+                alertSaved: 'Enregistrée ! ✅',
+                clientPlaceholder: 'Nom du client', newItem: 'Nouvel article', invoiceTitle: 'Facture', exportBtn: 'Exporter CSV',
+                backupBtn: 'Sauvegarder', restoreBtn: 'Restaurer',
+                setCurr: 'Devise', setTaxN: 'Nom de la taxe', setTaxR: 'Taux de taxe %', setSeller: 'Nom de l\'entreprise', setVat: 'ID fiscal / RC', saveSetBtn: 'Enregistrer',
+                invPrefix: 'Préfixe facture', invNextNo: 'Prochain N°', selectCountry: 'Sélectionner le pays', setNumFmt: 'Format numérique',
+                thDate: 'Date', thAction: 'Action',
+                clientsTitle: 'Gestion des clients', addClient: 'Ajouter un client', clientName: 'Nom', clientPhone: 'Téléphone', clientEmail: 'Email', clientTaxId: 'ID fiscal',
+                clientInfo: 'Informations client', cancelBtn: 'Annuler', saveClientBtn: 'Enregistrer',
+                clientNamePH: 'Nom complet', clientPhonePH: 'Numéro de téléphone', clientEmailPH: 'Adresse email', clientTaxPH: 'ID fiscal', clientAddrPH: 'Adresse',
+                notesLabel: 'Notes / Conditions', notesPH: 'Conditions de paiement, notes...',
+                paymentLabel: 'Mode de paiement', bankTransfer: 'Virement', cash: 'Espèces', card: 'Carte', cheque: 'Chèque',
+                confirmDelete: 'Confirmer la suppression ?',
+                noClients: 'Aucun client pour le moment', confirmReset: 'Cela supprimera TOUTES les données !',
+                logoLabel: 'Logo entreprise', logoSublabel: 'Apparaît sur les factures et PDF (max 2 Mo)', removeLogo: 'Supprimer',
+
+            },
+            es: {
+                navDash: 'Panel', navInv: 'Nueva factura', navHistory: 'Archivo', navSettings: 'Ajustes', navClients: 'Clientes',
+                resetBtn: 'REINICIAR', langGuide: 'Idioma', darkMode: 'Modo oscuro',
+                dashTitle: 'Tu facturación, perfectamente gestionada', totalSales: 'Ventas totales', invCount: 'Facturas', outstanding: 'Pendiente', overdueAmt: 'Vencido',
+                uploadLogo: 'SUBIR LOGO', invNo: 'FACT N°', buyerLabel: 'Cliente',
+                dateLabel: 'Fecha de emisión', dueDateLabel: 'Fecha de vencimiento', invDate: 'Fecha de factura',
+                thDesc: 'Descripción', thUnit: 'Unidad', thQty: 'Cant', thPrice: 'Precio', thTotal: 'Total',
+                addItemBtn: '+ Añadir artículo', subtotalLabel: 'Importe neto:', printBtn: '🖨️ Imprimir', saveBtn: '🚀 Emitir', refreshBtn: '🔄 Actualizar',
+                downloadPDF: '📥 Descargar PDF', savePdfBtn: '💾 Guardar & Descargar PDF',
+                historyTitle: 'Archivo de facturas', paid: 'Pagada', unpaid: 'Impaga', draft: 'Borrador', overdue: 'Vencida', cancelled: 'Cancelada',
+                alertSaved: '¡Guardada! ✅',
+                clientPlaceholder: 'Nombre del cliente', newItem: 'Nuevo artículo', invoiceTitle: 'Factura', exportBtn: 'Exportar CSV',
+                backupBtn: 'Respaldar', restoreBtn: 'Restaurar',
+                setCurr: 'Moneda', setTaxN: 'Nombre del impuesto', setTaxR: 'Tasa de impuesto %', setSeller: 'Nombre de la empresa', setVat: 'ID fiscal / RC', saveSetBtn: 'Guardar',
+                invPrefix: 'Prefijo factura', invNextNo: 'Siguiente N°', selectCountry: 'Seleccionar país', setNumFmt: 'Formato numérico',
+                thDate: 'Fecha', thAction: 'Acción',
+                clientsTitle: 'Gestión de clientes', addClient: 'Añadir cliente', clientName: 'Nombre', clientPhone: 'Teléfono', clientEmail: 'Email', clientTaxId: 'ID fiscal',
+                clientInfo: 'Información del cliente', cancelBtn: 'Cancelar', saveClientBtn: 'Guardar',
+                clientNamePH: 'Nombre completo', clientPhonePH: 'Número de teléfono', clientEmailPH: 'Dirección de email', clientTaxPH: 'ID fiscal', clientAddrPH: 'Dirección',
+                notesLabel: 'Notas / Términos', notesPH: 'Términos de pago, notas...',
+                paymentLabel: 'Método de pago', bankTransfer: 'Transferencia', cash: 'Efectivo', card: 'Tarjeta', cheque: 'Cheque',
+                confirmDelete: '¿Confirmar eliminación?',
+                noClients: 'Sin clientes aún', confirmReset: '¡Esto eliminará TODOS los datos!',
+                logoLabel: 'Logo empresa', logoSublabel: 'Aparece en facturas y PDF (máx 2 MB)', removeLogo: 'Eliminar',
+
+            }
+        };
+
+        const COUNTRIES = [
+            { code: 'AR', nameAr: 'الأرجنتين', nameEn: 'Argentina', curr: 'ARS', phone: '+54', taxN: 'IVA', taxR: 21, numFmt: 'de' },
+            { code: 'AU', nameAr: 'أستراليا', nameEn: 'Australia', curr: 'AUD', phone: '+61', taxN: 'GST', taxR: 10, numFmt: 'en' },
+            { code: 'AT', nameAr: 'النمسا', nameEn: 'Austria', curr: 'EUR', phone: '+43', taxN: 'MwSt', taxR: 20, numFmt: 'de' },
+            { code: 'BD', nameAr: 'بنغلاديش', nameEn: 'Bangladesh', curr: 'BDT', phone: '+880', taxN: 'VAT', taxR: 15, numFmt: 'en' },
+            { code: 'BE', nameAr: 'بلجيكا', nameEn: 'Belgium', curr: 'EUR', phone: '+32', taxN: 'TVA', taxR: 21, numFmt: 'de' },
+            { code: 'BR', nameAr: 'البرازيل', nameEn: 'Brazil', curr: 'BRL', phone: '+55', taxN: 'ICMS', taxR: 18, numFmt: 'de' },
+            { code: 'CA', nameAr: 'كندا', nameEn: 'Canada', curr: 'CAD', phone: '+1', taxN: 'GST/HST', taxR: 5, numFmt: 'en' },
+            { code: 'CL', nameAr: 'تشيلي', nameEn: 'Chile', curr: 'CLP', phone: '+56', taxN: 'IVA', taxR: 19, numFmt: 'en' },
+            { code: 'CN', nameAr: 'الصين', nameEn: 'China', curr: 'CNY', phone: '+86', taxN: 'VAT', taxR: 13, numFmt: 'en' },
+            { code: 'CO', nameAr: 'كولومبيا', nameEn: 'Colombia', curr: 'COP', phone: '+57', taxN: 'IVA', taxR: 19, numFmt: 'en' },
+            { code: 'DK', nameAr: 'الدنمارك', nameEn: 'Denmark', curr: 'DKK', phone: '+45', taxN: 'VAT', taxR: 25, numFmt: 'de' },
+            { code: 'FI', nameAr: 'فنلندا', nameEn: 'Finland', curr: 'EUR', phone: '+358', taxN: 'VAT', taxR: 24, numFmt: 'de' },
+            { code: 'FR', nameAr: 'فرنسا', nameEn: 'France', curr: 'EUR', phone: '+33', taxN: 'TVA', taxR: 20, numFmt: 'fr' },
+            { code: 'DE', nameAr: 'ألمانيا', nameEn: 'Germany', curr: 'EUR', phone: '+49', taxN: 'MwSt', taxR: 19, numFmt: 'de' },
+            { code: 'GR', nameAr: 'اليونان', nameEn: 'Greece', curr: 'EUR', phone: '+30', taxN: 'IVA', taxR: 24, numFmt: 'de' },
+            { code: 'IN', nameAr: 'الهند', nameEn: 'India', curr: 'INR', phone: '+91', taxN: 'GST', taxR: 18, numFmt: 'en' },
+            { code: 'ID', nameAr: 'إندونيسيا', nameEn: 'Indonesia', curr: 'IDR', phone: '+62', taxN: 'VAT (PPN)', taxR: 11, numFmt: 'en' },
+            { code: 'IE', nameAr: 'أيرلندا', nameEn: 'Ireland', curr: 'EUR', phone: '+353', taxN: 'VAT', taxR: 23, numFmt: 'en' },
+            { code: 'IT', nameAr: 'إيطاليا', nameEn: 'Italy', curr: 'EUR', phone: '+39', taxN: 'IVA', taxR: 22, numFmt: 'de' },
+            { code: 'JP', nameAr: 'اليابان', nameEn: 'Japan', curr: 'JPY', phone: '+81', taxN: 'Consumption Tax', taxR: 10, numFmt: 'en' },
+            { code: 'KE', nameAr: 'كينيا', nameEn: 'Kenya', curr: 'KES', phone: '+254', taxN: 'VAT', taxR: 16, numFmt: 'en' },
+            { code: 'MY', nameAr: 'ماليزيا', nameEn: 'Malaysia', curr: 'MYR', phone: '+60', taxN: 'SST', taxR: 8, numFmt: 'en' },
+            { code: 'MX', nameAr: 'المكسيك', nameEn: 'Mexico', curr: 'MXN', phone: '+52', taxN: 'IVA', taxR: 16, numFmt: 'en' },
+            { code: 'NL', nameAr: 'هولندا', nameEn: 'Netherlands', curr: 'EUR', phone: '+31', taxN: 'BTW', taxR: 21, numFmt: 'de' },
+            { code: 'NZ', nameAr: 'نيوزيلندا', nameEn: 'New Zealand', curr: 'NZD', phone: '+64', taxN: 'GST', taxR: 15, numFmt: 'en' },
+            { code: 'NG', nameAr: 'نيجيريا', nameEn: 'Nigeria', curr: 'NGN', phone: '+234', taxN: 'VAT', taxR: 7.5, numFmt: 'en' },
+            { code: 'NO', nameAr: 'النرويج', nameEn: 'Norway', curr: 'NOK', phone: '+47', taxN: 'VAT', taxR: 25, numFmt: 'de' },
+            { code: 'PK', nameAr: 'باكستان', nameEn: 'Pakistan', curr: 'PKR', phone: '+92', taxN: 'Sales Tax', taxR: 17, numFmt: 'en' },
+            { code: 'PE', nameAr: 'بيرو', nameEn: 'Peru', curr: 'PEN', phone: '+51', taxN: 'IGV', taxR: 18, numFmt: 'en' },
+            { code: 'PH', nameAr: 'الفلبين', nameEn: 'Philippines', curr: 'PHP', phone: '+63', taxN: 'VAT', taxR: 12, numFmt: 'en' },
+            { code: 'PL', nameAr: 'بولندا', nameEn: 'Poland', curr: 'PLN', phone: '+48', taxN: 'VAT', taxR: 23, numFmt: 'fr' },
+            { code: 'PT', nameAr: 'البرتغال', nameEn: 'Portugal', curr: 'EUR', phone: '+351', taxN: 'IVA', taxR: 23, numFmt: 'de' },
+            { code: 'RU', nameAr: 'روسيا', nameEn: 'Russia', curr: 'RUB', phone: '+7', taxN: 'VAT', taxR: 20, numFmt: 'de' },
+            { code: 'SG', nameAr: 'سنغافورة', nameEn: 'Singapore', curr: 'SGD', phone: '+65', taxN: 'GST', taxR: 9, numFmt: 'en' },
+            { code: 'ZA', nameAr: 'جنوب إفريقيا', nameEn: 'South Africa', curr: 'ZAR', phone: '+27', taxN: 'VAT', taxR: 15, numFmt: 'en' },
+            { code: 'KR', nameAr: 'كوريا الجنوبية', nameEn: 'South Korea', curr: 'KRW', phone: '+82', taxN: 'VAT', taxR: 10, numFmt: 'en' },
+            { code: 'ES', nameAr: 'إسبانيا', nameEn: 'Spain', curr: 'EUR', phone: '+34', taxN: 'IVA', taxR: 21, numFmt: 'de' },
+            { code: 'SE', nameAr: 'السويد', nameEn: 'Sweden', curr: 'SEK', phone: '+46', taxN: 'VAT', taxR: 25, numFmt: 'fr' },
+            { code: 'CH', nameAr: 'سويسرا', nameEn: 'Switzerland', curr: 'CHF', phone: '+41', taxN: 'VAT', taxR: 8.1, numFmt: 'de' },
+            { code: 'TH', nameAr: 'تايلاند', nameEn: 'Thailand', curr: 'THB', phone: '+66', taxN: 'VAT', taxR: 7, numFmt: 'en' },
+            { code: 'TR', nameAr: 'تركيا', nameEn: 'Turkey', curr: 'TRY', phone: '+90', taxN: 'KDV', taxR: 18, numFmt: 'de' },
+            { code: 'GB', nameAr: 'المملكة المتحدة', nameEn: 'United Kingdom', curr: 'GBP', phone: '+44', taxN: 'VAT', taxR: 20, numFmt: 'en' },
+            { code: 'US', nameAr: 'الولايات المتحدة', nameEn: 'United States', curr: 'USD', phone: '+1', taxN: 'Sales Tax', taxR: 7, numFmt: 'en' },
+            { code: 'VN', nameAr: 'فيتنام', nameEn: 'Vietnam', curr: 'VND', phone: '+84', taxN: 'VAT', taxR: 10, numFmt: 'en' },
+            { code: 'SA', nameEn: 'Saudi Arabia', curr: 'SAR', phone: '+966', taxN: 'VAT', taxR: 15, numFmt: 'en' },
+            { code: 'EG', nameEn: 'Egypt', curr: 'EGP', phone: '+20', taxN: 'VAT', taxR: 14, numFmt: 'en' },
+            { code: 'AE', nameEn: 'United Arab Emirates', curr: 'AED', phone: '+971', taxN: 'VAT', taxR: 5, numFmt: 'en' },
+            { code: 'QA', nameEn: 'Qatar', curr: 'QAR', phone: '+974', taxN: 'VAT', taxR: 0, numFmt: 'en' },
+            { code: 'KW', nameEn: 'Kuwait', curr: 'KWD', phone: '+965', taxN: 'VAT', taxR: 0, numFmt: 'en' },
+            { code: 'OM', nameEn: 'Oman', curr: 'OMR', phone: '+968', taxN: 'VAT', taxR: 0, numFmt: 'en' },
+            { code: 'BH', nameEn: 'Bahrain', curr: 'BHD', phone: '+973', taxN: 'VAT', taxR: 0, numFmt: 'en' },
+            { code: 'IQ', nameEn: 'Iraq', curr: 'IQD', phone: '+964', taxN: 'VAT', taxR: 0, numFmt: 'en' },
+            { code: 'JO', nameEn: 'Jordan', curr: 'JOD', phone: '+962', taxN: 'Sales Tax', taxR: 16, numFmt: 'en' },
+            { code: 'LB', nameEn: 'Lebanon', curr: 'LBP', phone: '+961', taxN: 'VAT', taxR: 11, numFmt: 'en' },
+            { code: 'MA', nameEn: 'Morocco', curr: 'MAD', phone: '+212', taxN: 'VAT', taxR: 20, numFmt: 'fr' },
+            { code: 'DZ', nameEn: 'Algeria', curr: 'DZD', phone: '+213', taxN: 'VAT', taxR: 19, numFmt: 'fr' },
+            { code: 'TN', nameEn: 'Tunisia', curr: 'TND', phone: '+216', taxN: 'VAT', taxR: 19, numFmt: 'fr' },
+            { code: 'LY', nameEn: 'Libya', curr: 'LYD', phone: '+218', taxN: 'VAT', taxR: 0, numFmt: 'en' },
+            { code: 'SD', nameEn: 'Sudan', curr: 'SDG', phone: '+249', taxN: 'VAT', taxR: 17, numFmt: 'en' },
+            { code: 'SY', nameEn: 'Syria', curr: 'SYP', phone: '+963', taxN: 'VAT', taxR: 0, numFmt: 'en' },
+            { code: 'YE', nameEn: 'Yemen', curr: 'YER', phone: '+967', taxN: 'VAT', taxR: 0, numFmt: 'en' },
+            { code: 'PS', nameEn: 'Palestine', curr: 'ILS', phone: '+970', taxN: 'VAT', taxR: 17, numFmt: 'en' },
+        ];
+
+        const DB_KEY = 'accuflow_erp_en_v1';
+        const CLIENTS_KEY = 'accuflow_clients_v1';
+        const FREE_LIMIT = 10;
+
+        // Cloud sync config — replace with your Render deployment URL and a strong secret
+        const API_URL = 'https://accuflow-en-api.onrender.com';
+        const API_KEY = 'change-this-to-a-secret-key';
+
+        let chartInstance = null;
+        let editClientIdx = null;
+        let syncTimer = null;
+
+        function scheduleSync() {
+            clearTimeout(syncTimer);
+            syncTimer = setTimeout(syncToCloud, 300);
+        }
+
+        async function syncFromCloud() {
+            try {
+                const r = await fetch(API_URL + '/api/data', { headers: { 'x-api-key': API_KEY } });
+                if (!r.ok) return;
+                const d = await r.json();
+                if (d.invoices) localStorage.setItem(DB_KEY, JSON.stringify(d.invoices));
+                if (d.clients) localStorage.setItem(CLIENTS_KEY, JSON.stringify(d.clients));
+                if (d.settings) localStorage.setItem('accu_s_v18', JSON.stringify(d.settings));
+                if (d.lang) localStorage.setItem('accu_lang', d.lang);
+                if (d.dark) localStorage.setItem('accu_dark', d.dark);
+                if (d.logo) localStorage.setItem('accu_logo', d.logo);
+            } catch(e) { console.log('Cloud unavailable, using local data'); }
+        }
+
+        async function syncToCloud() {
+            try {
+                await fetch(API_URL + '/api/data', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY },
+                    body: JSON.stringify({
+                        invoices: state.history,
+                        clients: state.clients,
+                        settings: state.sets,
+                        lang: state.lang,
+                        dark: localStorage.getItem('accu_dark'),
+                        logo: localStorage.getItem('accu_logo')
+                    })
+                });
+            } catch(e) { console.log('Cloud sync failed, saved locally'); }
+        }
+
+        function deleteInvoice(idx) {
+            if (!confirm(i18n[state.lang].confirmDelete)) return;
+            state.history.splice(idx, 1);
+            localStorage.setItem(DB_KEY, JSON.stringify(state.history));
+            scheduleSync();
+            renderHistory();
+        }
+
+        function deleteClient(i) {
+            if (!confirm(i18n[state.lang].confirmDelete)) return;
+            state.clients.splice(i, 1);
+            localStorage.setItem(CLIENTS_KEY, JSON.stringify(state.clients));
+            scheduleSync();
+            renderClients();
+        }
+        let state = {
+            lang: localStorage.getItem('accu_lang') || 'en',
+            items: [],
+            history: JSON.parse(localStorage.getItem(DB_KEY)) || [],
+            clients: JSON.parse(localStorage.getItem(CLIENTS_KEY)) || [],
+            sets: JSON.parse(localStorage.getItem('accu_s_v18')) || { curr: 'USD', taxN: 'Sales Tax', taxR: 7, seller: '', vat: '', invPrefix: 'INV-', invNext: 1, country: 'US', numFmt: 'en' },
+            editIdx: null
+        };
+
+        function invoiceCount() { return state.history.filter(h => h.status !== 'draft').length; }
+
+        function fmtNum(n) {
+            if (state.sets.numFmt === 'de') {
+                const parts = n.toFixed(2).split('.');
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                return parts.join(',');
+            }
+            if (state.sets.numFmt === 'fr') {
+                return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ').replace('.', ',');
+            }
+            return n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        function toggleDark() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('accu_dark', document.body.classList.contains('dark-mode') ? '1' : '0');
+            document.getElementById('darkToggle').innerHTML = (document.body.classList.contains('dark-mode') ? '☀️' : '🌙') + ' <span data-i18n="darkMode">' + i18n[state.lang].darkMode + '</span>';
+        }
+
+        function switchLang(l) { state.lang = l; localStorage.setItem('accu_lang', l); document.querySelector('select[onchange^="switchLang"]').value = l; document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = i18n[l][el.dataset.i18n]); document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = i18n[l][el.dataset.i18nPlaceholder]); if (l === 'ar') { document.documentElement.dir = 'rtl'; document.getElementById('mainContent').style.margin = '0 16rem 0 0'; document.getElementById('sidebar').style.right = '0'; document.getElementById('sidebar').style.left = 'auto'; } else { document.documentElement.dir = 'ltr'; document.getElementById('mainContent').style.margin = '0 0 0 16rem'; document.getElementById('sidebar').style.right = 'auto'; document.getElementById('sidebar').style.left = '0'; } }
+
+        function showSection(id) {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('sec-' + id).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav', 'active-nav-en'));
+            const btn = document.getElementById('nav-' + id);
+            btn.classList.add('active-nav');
+            if (state.lang === 'en') { btn.classList.add('active-nav-en'); document.getElementById('mainHtml').className='ltr'; }
+            else { document.getElementById('mainHtml').className='rtl'; }
+            if(id === 'dashboard') { renderDash(); renderChart(); }
+            if(id === 'invoicing') renderInv();
+            if(id === 'history') renderHistory();
+            if(id === 'clients') renderClients();
+        }
+
+        function prepareNewInvoice() {
+            state.editIdx = null;
+            state.items = [{desc: i18n[state.lang].newItem, unit: 'pc', qty: 1, price: 0}];
+            document.getElementById('cName').value = "";
+            document.getElementById('invStatus').value = "unpaid";
+            document.getElementById('invNotes').value = "";
+            document.getElementById('invPayMethod').value = "bank";
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('invDueDate').value = today;
+            document.getElementById('invId').value = state.sets.invPrefix + String(state.sets.invNext).padStart(4, '0');
+            showSection('invoicing'); updateStamp(); updateClientDatalist();
+        }
+
+        /* ======================================================
+           printInvoice — يملأ هيدر الطباعة ثم يطبع
+           هيدر الطباعة موجود داخل <thead> فيتكرر تلقائياً
+           في كل صفحة بواسطة CSS display:table-header-group
+           ====================================================== */
+        function printInvoice() {
+            const t = i18n[state.lang];
+
+            // --- اسم البائع ---
+            document.getElementById('printSellerName').innerText = state.sets.seller || '';
+            document.getElementById('printInvTitle').innerText   = t.invoiceTitle || 'TAX INVOICE';
+
+            // --- رقم الفاتورة والتاريخ ---
+            document.getElementById('printInvNoLabel').innerText = (t.invNo || 'INV NO') + ' ';
+            document.getElementById('printInvNo').innerText      = document.getElementById('invId').value;
+            document.getElementById('printDateStr').innerText    = document.getElementById('invDateFull').innerText;
+
+            // --- اسم العميل ---
+            document.getElementById('printClientLabel').innerText = t.buyerLabel || 'Customer';
+            document.getElementById('printClientName').innerText  = document.getElementById('cName').value || '';
+
+            // --- الحالة badge ---
+            const s = document.getElementById('invStatus').value;
+            const badge = document.getElementById('printStatusBadge');
+            badge.innerText = t[s] || s.toUpperCase();
+            badge.style.background = s === 'paid' ? '#d1fae5' : s === 'unpaid' ? '#fee2e2' : '#e2e8f0';
+            badge.style.color      = s === 'paid' ? '#065f46' : s === 'unpaid' ? '#991b1b' : '#475569';
+
+            // --- اللوجو ---
+            const logo = localStorage.getItem('accu_logo');
+            const printLogoArea = document.getElementById('print-logo-area');
+            const printLogoImg  = document.getElementById('printLogoImg');
+            if (logo) {
+                printLogoImg.src = logo;
+                printLogoArea.style.display = 'block';
+            } else {
+                printLogoArea.style.display = 'none';
+            }
+
+            // --- الملاحظات في نهاية الفاتورة ---
+            const notes = document.getElementById('invNotes').value.trim();
+            const notesArea = document.getElementById('printNotesArea');
+            if (notes) {
+                document.getElementById('printNotesLabel').innerText = (t.notesLabel || 'Notes') + ': ';
+                document.getElementById('printNotesText').innerText  = notes;
+                notesArea.classList.remove('hidden');
+            } else {
+                notesArea.classList.add('hidden');
+            }
+
+            // --- إظهار هيدر الطباعة وإخفاء هيدر الشاشة مؤقتاً ---
+            document.querySelector('.print-inv-header').style.display = 'block';
+
+            window.print();
+        }
+
+        function updateStamp() {
+            const s = document.getElementById('invStatus').value;
+            const label = i18n[state.lang][s] || s.toUpperCase();
+            // Watermark
+            const watermark = document.getElementById('statusWatermark');
+            watermark.innerText = label; watermark.style.display = 'block';
+            if(s === 'paid') { watermark.style.color = 'rgba(16, 185, 129, 0.12)'; watermark.style.borderColor = 'rgba(16, 185, 129, 0.2)'; }
+            else if(s === 'unpaid' || s === 'overdue') { watermark.style.color = 'rgba(239, 68, 68, 0.12)'; watermark.style.borderColor = 'rgba(239, 68, 68, 0.2)'; }
+            else { watermark.style.color = 'rgba(100, 116, 139, 0.12)'; watermark.style.borderColor = 'rgba(100, 116, 139, 0.2)'; }
+            // Badge
+            const badge = document.getElementById('invStatusBadge');
+            badge.innerText = label;
+            badge.className = 'inline-block px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider shadow-sm';
+            if(s === 'paid') badge.className += ' bg-emerald-500 text-white';
+            else if(s === 'unpaid' || s === 'overdue') badge.className += ' bg-rose-500 text-white';
+            else badge.className += ' bg-slate-400 text-white';
+        }
+
+        function renderInv() {
+            const list = document.getElementById('itemsList');
+            list.innerHTML = state.items.map((it, i) => `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="py-2.5 text-slate-800"><input value="${it.desc}" onblur="state.items[${i}].desc=this.value" class="w-full bg-transparent outline-none font-bold text-sm"></td>
+                    <td class="py-2.5 text-center"><input value="${it.unit}" onblur="state.items[${i}].unit=this.value" class="w-12 bg-slate-100 rounded-lg text-center outline-none text-xs"></td>
+                    <td class="py-2.5 text-center text-indigo-700 font-black"><input type="number" value="${it.qty}" onblur="state.items[${i}].qty=parseFloat(this.value)||0" class="w-12 bg-slate-50 rounded-lg text-center outline-none"></td>
+                    <td class="py-2.5 text-center font-black"><input type="number" value="${it.price}" onblur="state.items[${i}].price=parseFloat(this.value)||0" class="w-20 text-center bg-transparent outline-none font-black text-slate-800"></td>
+                    <td class="py-2.5 text-left pl-4 font-black text-sm">${fmtNum((it.qty||0)*(it.price||0))}</td>
+                    <td class="py-2.5 no-print text-center"><button onclick="state.items.splice(${i},1);renderInv()" class="text-rose-300 hover:text-rose-500 transition-all text-xs">✕</button></td>
+                </tr>
+            `).join('');
+            calc();
+        }
+
+        function calc() {
+            let sub = 0; state.items.forEach(i => sub += (i.qty * i.price));
+            const tx = sub * (state.sets.taxR / 100);
+            const tot = sub + tx;
+            const cur = state.sets.curr;
+            document.getElementById('vSub').innerText = fmtNum(sub) + " " + cur;
+            document.getElementById('vTax').innerText = fmtNum(tx) + " " + cur;
+            document.getElementById('vTot').innerText = fmtNum(tot);
+            document.querySelectorAll('.currency-label').forEach(el => el.innerText = cur);
+            document.getElementById('lblTax').innerText = `${state.sets.taxN} (${state.sets.taxR}%):`;
+            const now = new Date();
+            const dateStr = now.toLocaleString(state.lang === 'ar' ? 'ar-SA' : 'en-US');
+            document.getElementById('invDateFull').innerText = dateStr;
+            document.getElementById('invDateNow').innerText = dateStr;
+            document.getElementById('qrcode').innerHTML = "";
+            if (window.QRCode) { new QRCode(document.getElementById('qrcode'), { text: `Seller:${state.sets.seller}|TaxID:${state.sets.vat}|Total:${tot.toFixed(2)}|Date:${now.toISOString()}`, width: 85, height: 85, colorDark: "#1e293b" }); }
+        }
+
+        function saveInvoice() {
+            let subAmt = state.items.reduce((a,b)=>a+(b.qty*b.price),0);
+            const now = new Date();
+            const data = {
+                id: document.getElementById('invId').value,
+                date: now.toLocaleString(),
+                dueDate: document.getElementById('invDueDate').value || '',
+                client: document.getElementById('cName').value || 'N/A',
+                items: JSON.parse(JSON.stringify(state.items)),
+                total: subAmt*(1+state.sets.taxR/100),
+                subAmt: subAmt,
+                taxAmt: subAmt*(state.sets.taxR/100),
+                curr: state.sets.curr,
+                status: document.getElementById('invStatus').value,
+                notes: document.getElementById('invNotes').value || '',
+                payMethod: document.getElementById('invPayMethod').value || 'bank'
+            };
+            if(state.editIdx !== null) state.history[state.editIdx] = data;
+            else { state.history.push(data); state.sets.invNext++; }
+            localStorage.setItem(DB_KEY, JSON.stringify(state.history));
+            localStorage.setItem('accu_s_v18', JSON.stringify(state.sets));
+            scheduleSync();
+            alert(i18n[state.lang].alertSaved); state.editIdx = null; showSection('history');
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('fullHistoryList');
+            const t = i18n[state.lang];
+            list.innerHTML = state.history.slice().reverse().map((h, i) => {
+                const idx = state.history.length - 1 - i;
+                let status = h.status || 'unpaid';
+                if (status === 'unpaid' && h.dueDate && new Date(h.dueDate) < new Date(new Date().toDateString())) status = 'overdue';
+                let bCls = status === 'paid' ? 'bg-emerald-100 text-emerald-700' :
+                           status === 'overdue' ? 'bg-red-100 text-red-700' :
+                           status === 'unpaid' ? 'bg-amber-100 text-amber-700' :
+                           status === 'draft' ? 'bg-slate-200 text-slate-600' : 'bg-slate-200 text-slate-600';
+                return `<tr class="hover:bg-slate-50 transition border-b">
+                    <td class="p-5 font-black text-indigo-700 uppercase text-xs">${h.id}</td>
+                    <td class="p-5 text-slate-400 text-[10px]">${h.date}</td>
+                    <td class="p-5 text-slate-400 text-[10px]">${h.dueDate || '—'}</td>
+                    <td class="p-5 font-bold italic text-sm">${h.client}</td>
+                    <td class="p-5 text-center"><span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${bCls}">${t[status] || status}</span></td>
+                    <td class="p-5 text-left text-slate-900 font-black tracking-tighter">${fmtNum(h.total)} ${h.curr}</td>
+                    <td class="p-5 text-center flex justify-center gap-2">
+                        <button onclick="editInv(${idx})" class="p-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm text-xs">✏️</button>
+                        <button onclick="deleteInvoice(${idx})" class="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all shadow-sm text-xs">🗑️</button>
+                        <button onclick="duplicateInv(${idx})" class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm text-xs">📋</button>
+                    </td></tr>`;
+            }).join('');
+        }
+
+        function duplicateInv(i) {
+            const h = state.history[i];
+            const copy = JSON.parse(JSON.stringify(h));
+            copy.id = state.sets.invPrefix + String(state.sets.invNext).padStart(4, '0');
+            copy.date = new Date().toLocaleString();
+            copy.status = 'draft';
+            state.history.push(copy);
+            state.sets.invNext++;
+            localStorage.setItem(DB_KEY, JSON.stringify(state.history));
+            localStorage.setItem('accu_s_v18', JSON.stringify(state.sets));
+            scheduleSync();
+            renderHistory();
+        }
+
+        function editInv(i) {
+            const h = state.history[i];
+            state.items = JSON.parse(JSON.stringify(h.items));
+            state.editIdx = i;
+            showSection('invoicing');
+            document.getElementById('invId').value = h.id;
+            document.getElementById('cName').value = h.client;
+            document.getElementById('invStatus').value = h.status || 'unpaid';
+            document.getElementById('invNotes').value = h.notes || '';
+            document.getElementById('invPayMethod').value = h.payMethod || 'bank';
+            document.getElementById('invDueDate').value = h.dueDate || '';
+            renderInv(); updateStamp();
+        }
+
+        function renderDash() {
+            let sales = 0, outstanding = 0, overdueAmt = 0, invCount = 0;
+            const today = new Date(new Date().toDateString());
+            state.history.forEach(h => {
+                if (h.status === 'draft' || h.status === 'cancelled') return;
+                sales += h.total || 0; invCount++;
+                if (h.status === 'unpaid') {
+                    outstanding += h.total || 0;
+                    if (h.dueDate && new Date(h.dueDate) < today) overdueAmt += h.total || 0;
+                }
+            });
+            document.getElementById('dashSales').innerText = fmtNum(sales) + " " + state.sets.curr;
+            document.getElementById('dashCount').innerText = invCount;
+            document.getElementById('dashOutstanding').innerText = fmtNum(outstanding) + " " + state.sets.curr;
+            document.getElementById('dashOverdue').innerText = fmtNum(overdueAmt) + " " + state.sets.curr;
+            document.getElementById('topDate').innerText = new Date().toLocaleDateString(state.lang==='ar'?'ar-SA':'en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+        }
+
+        function renderChart() {
+            const months = state.lang === 'ar'
+                ? ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر']
+                : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const data = new Array(12).fill(0);
+            state.history.forEach(h => {
+                if (h.status === 'draft' || h.status === 'cancelled') return;
+                const d = new Date(h.date);
+                const m = d.getMonth();
+                data[m] += h.total || 0;
+            });
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: state.lang === 'ar' ? 'الإيرادات' : 'Revenue',
+                        data: data,
+                        backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 2,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function downloadPDF(btn) {
+            btn.disabled = true; btn.innerText = '⏳ Generating...';
+            const el = document.getElementById('invoice-printable');
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: 'Invoice_' + document.getElementById('invId').value + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(el).save().then(() => {
+                btn.disabled = false; btn.innerHTML = '💾 ' + i18n[state.lang].savePdfBtn || 'Save & Download PDF';
+            });
+        }
+
+        function exportToCSV() {
+            if (state.history.length === 0) return alert('No Data!');
+            let csv = "\uFEFFID,Date,Due Date,Client,Status,Subtotal,Tax,Total,Currency,Payment Method\n";
+            state.history.forEach(h => {
+                csv += `"${h.id}","${h.date}","${h.dueDate||''}","${h.client}","${i18n[state.lang][h.status]||h.status}","${(h.subAmt||0).toFixed(2)}","${(h.taxAmt||0).toFixed(2)}","${h.total.toFixed(2)}","${h.curr}","${h.payMethod||''}"\n`;
+            });
+            const b = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const l = document.createElement("a"); l.href = URL.createObjectURL(b);
+            l.download = 'AccuFlow_' + new Date().toISOString().split('T')[0] + '.csv'; l.click();
+        }
+
+        function exportData() {
+            const data = { history: state.history, clients: state.clients, sets: state.sets };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const l = document.createElement("a"); l.href = URL.createObjectURL(blob);
+            l.download = 'AccuFlow_Backup_' + new Date().toISOString().split('T')[0] + '.json'; l.click();
+        }
+
+        function importData(e) {
+            const file = e.target.files[0]; if (!file) return;
+            const r = new FileReader();
+            r.onload = function() {
+                try {
+                    const data = JSON.parse(r.result);
+                    if (data.history) { state.history = data.history; localStorage.setItem(DB_KEY, JSON.stringify(state.history)); }
+                    if (data.clients) { state.clients = data.clients; localStorage.setItem(CLIENTS_KEY, JSON.stringify(state.clients)); }
+                    if (data.sets) { state.sets = data.sets; localStorage.setItem('accu_s_v18', JSON.stringify(state.sets)); }
+                    scheduleSync();
+                    alert('✅ ' + (state.lang === 'ar' ? 'تمت الاستعادة بنجاح' : 'Data restored successfully'));
+                    location.reload();
+                } catch(e) { alert('❌ ' + (state.lang === 'ar' ? 'خطأ في الملف' : 'Invalid file')); }
+            };
+            r.readAsText(file);
+            e.target.value = '';
+        }
+
+        function addItem() { state.items.push({desc: i18n[state.lang].newItem, unit: '', qty: 1, price: 0}); renderInv(); }
+
+        function handleLogo(e) {
+            const file = e.target.files[0]; if (!file) return;
+            if (file.size > 2 * 1024 * 1024) { alert('⚠️ ' + (state.lang === 'ar' ? 'الملف كبير جداً (الحد 2MB)' : 'File too large (max 2MB)')); return; }
+            const r = new FileReader();
+            r.onload = () => {
+                localStorage.setItem('accu_logo', r.result);
+                scheduleSync();
+                ['logoImage','logoPreviewSettings'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { el.src = r.result; el.classList.remove('hidden'); }
+                });
+                document.getElementById('removeLogoBtn').classList.remove('hidden');
+                document.getElementById('removeLogoSettingsBtn').classList.remove('hidden');
+                document.getElementById('logoText').classList.add('hidden');
+            };
+            r.readAsDataURL(file);
+        }
+        function removeLogo() {
+            localStorage.removeItem('accu_logo');
+            scheduleSync();
+            ['logoImage','logoPreviewSettings'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            document.getElementById('removeLogoBtn').classList.add('hidden');
+            document.getElementById('removeLogoSettingsBtn').classList.add('hidden');
+            document.getElementById('logoText').classList.remove('hidden');
+        }
+
+        function populateCurrencySelect() {
+            const sel = document.getElementById('sCurr');
+            const codes = [...new Set(COUNTRIES.map(c => c.curr))].sort();
+            sel.innerHTML = codes.map(code => `<option value="${code}">${code}</option>`).join('');
+        }
+
+        function applyCountry() {
+            const c = COUNTRIES.find(x => x.code === document.getElementById('sCountry').value);
+            if (!c) return;
+            document.getElementById('sCurr').value = c.curr;
+            document.getElementById('sTaxN').value = c.taxN;
+            document.getElementById('sTaxR').value = c.taxR;
+            document.getElementById('sNumFmt').value = c.numFmt;
+            document.getElementById('cfPhoneCode').innerText = c.phone;
+        }
+
+        function saveSets() {
+            state.sets = {
+                curr: document.getElementById('sCurr').value,
+                taxN: document.getElementById('sTaxN').value,
+                taxR: parseFloat(document.getElementById('sTaxR').value) || 0,
+                seller: document.getElementById('sSeller').value,
+                vat: document.getElementById('sVat').value,
+                invPrefix: document.getElementById('sInvPrefix').value || 'INV-',
+                invNext: parseInt(document.getElementById('sInvNext').value) || 1,
+                country: document.getElementById('sCountry').value || 'SA',
+                numFmt: document.getElementById('sNumFmt').value || 'en'
+            };
+            localStorage.setItem('accu_s_v18', JSON.stringify(state.sets));
+            scheduleSync();
+            location.reload();
+        }
+
+        function resetSystem() {
+            if (confirm(i18n[state.lang].confirmReset)) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // ========== Client Management ==========
+        function renderClients() {
+            const list = document.getElementById('clientsList');
+            const t = i18n[state.lang];
+            if (state.clients.length === 0) {
+                list.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-slate-400 italic">${t.noClients}</td></tr>`;
+                return;
+            }
+            list.innerHTML = state.clients.map((c, i) => `
+                <tr class="hover:bg-slate-50 transition border-b">
+                    <td class="p-5 font-black text-indigo-600 text-xs">${i + 1}</td>
+                    <td class="p-5 font-bold">${c.name}</td>
+                    <td class="p-5 text-slate-500 text-sm">${c.phone || '—'}</td>
+                    <td class="p-5 text-slate-500 text-sm">${c.email || '—'}</td>
+                    <td class="p-5 text-slate-500 text-sm">${c.tax || '—'}</td>
+                    <td class="p-5 text-center flex justify-center gap-2">
+                        <button onclick="editClient(${i})" class="p-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm text-xs">✏️</button>
+                        <button onclick="deleteClient(${i})" class="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all shadow-sm text-xs">🗑️</button>
+                    </td></tr>
+            `).join('');
+        }
+
+        function showClientForm() {
+            editClientIdx = null;
+            document.getElementById('cfName').value = '';
+            document.getElementById('cfPhone').value = '';
+            document.getElementById('cfEmail').value = '';
+            document.getElementById('cfTax').value = '';
+            document.getElementById('cfAddr').value = '';
+            document.getElementById('clientSaveBtn').innerText = i18n[state.lang].saveClientBtn;
+            document.getElementById('clientModal').classList.remove('hidden');
+        }
+
+        function closeClientForm() { document.getElementById('clientModal').classList.add('hidden'); }
+
+        function saveClient() {
+            const data = {
+                name: document.getElementById('cfName').value.trim(),
+                phone: document.getElementById('cfPhone').value.trim(),
+                email: document.getElementById('cfEmail').value.trim(),
+                tax: document.getElementById('cfTax').value.trim(),
+                addr: document.getElementById('cfAddr').value.trim()
+            };
+            if (!data.name) { alert('⚠️ ' + (state.lang === 'ar' ? 'الاسم مطلوب' : 'Name is required')); return; }
+            if (editClientIdx !== null) state.clients[editClientIdx] = data;
+            else state.clients.push(data);
+            localStorage.setItem(CLIENTS_KEY, JSON.stringify(state.clients));
+            scheduleSync();
+            closeClientForm(); renderClients(); updateClientDatalist();
+        }
+
+        function editClient(i) {
+            editClientIdx = i;
+            const c = state.clients[i];
+            document.getElementById('cfName').value = c.name || '';
+            document.getElementById('cfPhone').value = c.phone || '';
+            document.getElementById('cfEmail').value = c.email || '';
+            document.getElementById('cfTax').value = c.tax || '';
+            document.getElementById('cfAddr').value = c.addr || '';
+            document.getElementById('clientSaveBtn').innerText = (state.lang === 'ar' ? 'تحديث' : 'Update');
+            document.getElementById('clientModal').classList.remove('hidden');
+        }
+
+        function updateClientDatalist() {
+            const dl = document.getElementById('clientDatalist');
+            dl.innerHTML = state.clients.map(c => `<option value="${c.name}">`).join('');
+        }
+
+        function showClientSelector() {
+            if (state.clients.length === 0) { showClientForm(); return; }
+            const names = state.clients.map(c => c.name);
+            const choice = prompt(state.lang === 'ar' ? 'اختر العميل:\n' + names.map((n,i) => (i+1)+'. '+n).join('\n') : 'Select client:\n' + names.map((n,i) => (i+1)+'. '+n).join('\n'));
+            if (choice) {
+                const idx = parseInt(choice) - 1;
+                if (idx >= 0 && idx < state.clients.length) {
+                    document.getElementById('cName').value = state.clients[idx].name;
+                } else if (names.includes(choice)) {
+                    document.getElementById('cName').value = choice;
+                }
+            }
+        }
+
+        // ========== Print Visible Notes ==========
+        function getVisibleNotes() {
+            const notes = document.getElementById('invNotes').value;
+            if (!notes) return '';
+            return `<div class="px-10 pb-6 italic text-sm text-slate-500 border-t pt-4 mt-4"><strong>${i18n[state.lang].notesLabel}:</strong> ${notes}</div>`;
+        }
+
+        window.onload = async () => {
+            await syncFromCloud();
+            // Re-initialize state from localStorage (now with cloud data if sync succeeded)
+            state.lang = localStorage.getItem('accu_lang') || 'en';
+            state.history = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+            state.clients = JSON.parse(localStorage.getItem(CLIENTS_KEY)) || [];
+            state.sets = JSON.parse(localStorage.getItem('accu_s_v18')) || { curr: 'USD', taxN: 'Sales Tax', taxR: 7, seller: '', vat: '', invPrefix: 'INV-', invNext: 1, country: 'US', numFmt: 'en' };
+            document.getElementById('mainHtml').dir = 'ltr';
+            document.getElementById('mainContent').style.margin = '0 0 0 16rem';
+            document.getElementById('sidebar').style.right = 'auto';
+            document.getElementById('sidebar').style.left = '0';
+            document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = i18n[state.lang][el.dataset.i18n]);
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = i18n[state.lang][el.dataset.i18nPlaceholder]);
+            document.querySelector('select[onchange^="switchLang"]').value = state.lang;
+            // Dark mode
+            if (localStorage.getItem('accu_dark') === '1') { document.body.classList.add('dark-mode'); document.getElementById('darkToggle').innerHTML = '☀️ ' + i18n[state.lang].darkMode; }
+            // Logo
+            const logo = localStorage.getItem('accu_logo');
+            if (logo) {
+                document.getElementById('logoImage').src = logo; document.getElementById('logoImage').classList.remove('hidden');
+                document.getElementById('logoPreviewSettings').src = logo; document.getElementById('logoPreviewSettings').classList.remove('hidden');
+                document.getElementById('removeLogoBtn').classList.remove('hidden');
+                document.getElementById('removeLogoSettingsBtn').classList.remove('hidden');
+                document.getElementById('logoText').classList.add('hidden');
+            }
+            // Settings
+            const countrySel = document.getElementById('sCountry');
+            const t = i18n[state.lang];
+            countrySel.innerHTML = COUNTRIES.map(c =>
+                `<option value="${c.code}">${c.nameEn} (${c.curr})</option>`
+            ).join('');
+            countrySel.value = state.sets.country || 'US';
+            populateCurrencySelect();
+            document.getElementById('sCurr').value = state.sets.curr;
+            document.getElementById('sNumFmt').value = state.sets.numFmt || 'en';
+            document.getElementById('sSeller').value = state.sets.seller;
+            document.getElementById('sellerNameHeader').innerText = state.sets.seller;
+            document.getElementById('sTaxN').value = state.sets.taxN;
+            document.getElementById('sTaxR').value = state.sets.taxR;
+            document.getElementById('sVat').value = state.sets.vat;
+            document.getElementById('sInvPrefix').value = state.sets.invPrefix || 'INV-';
+            document.getElementById('sInvNext').value = state.sets.invNext || 1;
+            // Phone code
+            const countryData = COUNTRIES.find(x => x.code === countrySel.value);
+            if (countryData) document.getElementById('cfPhoneCode').innerText = countryData.phone;
+            renderDash(); renderChart(); showSection('dashboard');
+            updateStamp(); // تهيئة badge الحالة
+        };
+    </script>
+</body>
+</html>
